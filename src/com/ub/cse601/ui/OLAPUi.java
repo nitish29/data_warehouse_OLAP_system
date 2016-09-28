@@ -43,8 +43,9 @@ public class OLAPUi {
 
 		DBClient client = new DBClient();
 		ResultSet rs = client.getConn().createStatement().executeQuery("Select * from DISEASE");
+		System.out.println("DS_ID"+ "\t"+"DISEASE_NAME");
 		while(rs.next()){
-			//System.out.println(rs.ge);
+			System.out.println(rs.getString("DS_ID") +"\t"+rs.getString("NAME"));
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
