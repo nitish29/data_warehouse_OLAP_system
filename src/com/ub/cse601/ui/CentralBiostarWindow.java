@@ -49,10 +49,11 @@ public class CentralBiostarWindow {
 		try {
 			olapQueryClient = new OLAPQueries();
 			initialize();
-			this.msgBox = new JLabel("App initialized...Execute Queries Now");
+			msgBox.setText("App initialized...Execute Queries Now");
 
 		} catch (Exception ex) {
-			msgBox.setText("Exception: " + ex.getMessage());
+			msgBox.setText("Exception: " + ex);
+			System.out.println("Exception: " + ex);
 		}
 	}
 
@@ -242,12 +243,14 @@ public class CentralBiostarWindow {
 
 		// initialize combo boxes
 		queryCombo.insertItemAt("Query 1", 0);
-		queryCombo.insertItemAt("Query 2", 2);
-		queryCombo.insertItemAt("Query 3", 3);
-		queryCombo.insertItemAt("Query 4", 4);
-		queryCombo.insertItemAt("Query 5", 5);
-		queryCombo.insertItemAt("Query 6", 6);
+		queryCombo.insertItemAt("Query 2", 1);
+		queryCombo.insertItemAt("Query 3", 2);
+		queryCombo.insertItemAt("Query 4", 3);
+		queryCombo.insertItemAt("Query 5", 4);
+		queryCombo.insertItemAt("Query 6", 5);
+		queryCombo.setSelectedIndex(0);
 		diseaseCombo.insertItemAt("All", 0);
+		diseaseCombo.setSelectedIndex(0);
 
 		Iterator<Entry<Integer, String>> diseaseMapItr = olapQueryClient.allDiseaseList().entrySet().iterator();
 		while (diseaseMapItr.hasNext()) {
