@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OLAPQueries {
@@ -20,24 +21,39 @@ public class OLAPQueries {
 
 	}
 
-	public int queryForTumorALLPatients(String description, String type, String[] name) throws SQLException {
+	public Object[] queryForTumorALLPatients(String description, String type, String[] name) throws SQLException {
 
 		Statement stmt = null;
 		int count = 0;
+		List<String[]> queryOutput = null;
+		String[] columnNames = null;
+		Object[] output = null;
 
 		try {
-
-			String query = "select * from clinical_fact, disease where clinical_fact.DS_ID=disease.DS_ID AND disease.name='ALL' and disease.type='leukemia' and disease.description='tumor'";
+			output = new Object[3];
+			queryOutput = new ArrayList<String[]>();
+			String query = "select clinical_fact.P_ID, disease.name from clinical_fact, disease where clinical_fact.DS_ID=disease.DS_ID AND disease.name='ALL' and disease.type='leukemia' and disease.description='tumor' order by clinical_fact.P_ID ASC";
 
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
+			int colCount = rs.getMetaData().getColumnCount();
+			columnNames = new String[colCount];
 
-			while (rs.next()) {
-
-				count++;
-
+			for (int i = 0; i < colCount; i++) {
+				columnNames[i] = rs.getMetaData().getColumnLabel(i);
 			}
 
+			while (rs.next()) {
+				String[] row = new String[colCount];
+				for (int i = 0; i < colCount; i++) {
+					row[i] = rs.getString(i);
+				}
+				queryOutput.add(row);
+				count++;
+			}
+			output[0] = count;
+			output[1] = columnNames;
+			output[2] = queryOutput;
 		} catch (SQLException e) {
 
 			printSQLException(e);
@@ -51,7 +67,7 @@ public class OLAPQueries {
 			}
 
 		}
-		return count;
+		return output;
 
 	}
 
@@ -101,7 +117,7 @@ public class OLAPQueries {
 
 		try {
 
-			String query = "select disease.NAME, disease.DS_ID from disease";
+			String query = "select disease.NAME, disease.DS_ID from disease order by disease.DS_ID ASC";
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 
