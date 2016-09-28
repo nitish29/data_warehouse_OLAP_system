@@ -63,7 +63,7 @@ public class OLAPQueries {
 
         try {
 
-            String query = "select drug.type,disease.DESCRIPTION from drug, clinical_fact,disease where clinical_fact.DR_ID=drug.DR_ID AND clinical_fact.DS_ID=disease.DS_ID AND disease.DESCRIPTION='tumor';";
+            String query = "select drug.type,disease.DESCRIPTION from drug, clinical_fact,disease where clinical_fact.DR_ID=drug.DR_ID AND clinical_fact.DS_ID=disease.DS_ID AND disease.DESCRIPTION='tumor'";
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
@@ -95,7 +95,43 @@ public class OLAPQueries {
     }
 
 
-    public 
+    public ArrayList<String> AllDiseaseList() throws SQLException {
+
+        ArrayList<String> diseaseList = new ArrayList<String>();
+
+        Statement stmt = null;
+
+        try {
+
+            String query = "select disease.NAME from disease";
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+
+                String name = rs.getString("NAME");
+                diseaseList.add(name);
+
+            }
+
+
+        } catch ( SQLException e ) {
+
+            printSQLException(e);
+
+        } finally {
+
+            if ( stmt != null ) {
+
+                stmt.close();
+
+            }
+
+        }
+
+        return diseaseList;
+
+    }
 
 
 	
