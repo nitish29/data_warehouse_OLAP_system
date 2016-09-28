@@ -54,6 +54,7 @@ public class CentralBiostarWindow {
 	private JLabel lblQueryResults;
 	private JScrollPane scrollPane;
 	private JTable resultTable;
+	private JLabel lblResultCount;
 
 	/**
 	 * Create the application.
@@ -212,18 +213,31 @@ public class CentralBiostarWindow {
 		lblQueryResults.setHorizontalAlignment(SwingConstants.LEFT);
 
 		scrollPane = new JScrollPane();
+		
+		lblResultCount = new JLabel("Result Count: ");
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
-		gl_panel_3.setHorizontalGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createSequentialGroup().addContainerGap().addComponent(lblQueryResults)
-						.addContainerGap(857, Short.MAX_VALUE))
-				.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE));
-		gl_panel_3
-				.setVerticalGroup(
-						gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_3.createSequentialGroup().addGap(7).addComponent(lblQueryResults)
-										.addPreferredGap(ComponentPlacement.RELATED).addComponent(scrollPane,
-												GroupLayout.PREFERRED_SIZE, 229, GroupLayout.PREFERRED_SIZE)
-										.addContainerGap(35, Short.MAX_VALUE)));
+		gl_panel_3.setHorizontalGroup(
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblQueryResults)
+					.addContainerGap(857, Short.MAX_VALUE))
+				.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addComponent(lblResultCount)
+					.addContainerGap())
+		);
+		gl_panel_3.setVerticalGroup(
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addGap(7)
+					.addComponent(lblQueryResults)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 229, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblResultCount)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
 
 		resultTable = new JTable();
 		scrollPane.setViewportView(resultTable);
