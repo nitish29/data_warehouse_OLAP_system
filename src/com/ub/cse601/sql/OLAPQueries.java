@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OLAPQueries {
 
@@ -95,23 +97,24 @@ public class OLAPQueries {
     }
 
 
-    public ArrayList<String> allDiseaseList() throws SQLException {
+    public Map<String,String> allDiseaseList() throws SQLException {
 
-        ArrayList<String> diseaseList = new ArrayList<String>();
+        Map<String,String> diseaseMap = new HashMap<String, String>();
 
         Statement stmt = null;
 
         try {
 
-            String query = "select disease.NAME from disease";
+            String query = "select disease.NAME, disease.DS_ID from disease";
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
 
                 String name = rs.getString("NAME");
-                diseaseList.add(name);
-
+                String id = ""+ rs.getInt("DS_ID");
+                diseaseMap.put(id, name);
+                
             }
 
 
@@ -129,7 +132,7 @@ public class OLAPQueries {
 
         }
 
-        return diseaseList;
+        return diseaseMap;
 
     }
 
