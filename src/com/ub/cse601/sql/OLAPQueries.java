@@ -1,6 +1,7 @@
 package com.ub.cse601.sql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,9 +22,9 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] queryForTumorALLPatients(String description, String type, String[] name) throws SQLException {
+	public Object[] queryForTumorALLPatients(String diseaseName, String patientId) throws SQLException {
 
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		int count = 0;
 		List<String[]> queryOutput = null;
 		String[] columnNames = null;
@@ -32,21 +33,23 @@ public class OLAPQueries {
 		try {
 			output = new Object[3];
 			queryOutput = new ArrayList<String[]>();
-			String query = "select clinical_fact.P_ID, disease.name from clinical_fact, disease where clinical_fact.DS_ID=disease.DS_ID AND disease.name='ALL' and disease.type='leukemia' and disease.description='tumor' order by clinical_fact.P_ID ASC";
+			String query = "select cf.P_ID, ds.name from clinical_fact cf, disease ds where cf.DS_ID=ds.DS_ID AND ds.name=?"
+					+ " and ds.type='leukemia' and ds.description='tumor' order by cf.P_ID ASC";
 
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
+			stmt = conn.prepareStatement(query);
+			stmt.setString(1, diseaseName);
+			ResultSet rs = stmt.executeQuery();
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
 
 			for (int i = 0; i < colCount; i++) {
-				columnNames[i] = rs.getMetaData().getColumnLabel(i);
+				columnNames[i] = rs.getMetaData().getColumnLabel(i+1);
 			}
 
 			while (rs.next()) {
 				String[] row = new String[colCount];
 				for (int i = 0; i < colCount; i++) {
-					row[i] = rs.getString(i);
+					row[i] = rs.getString(i+1);
 				}
 				queryOutput.add(row);
 				count++;
