@@ -95,7 +95,7 @@ public class OLAPQueries {
     }
 
 
-    public ArrayList<String> AllDiseaseList() throws SQLException {
+    public ArrayList<String> allDiseaseList() throws SQLException {
 
         ArrayList<String> diseaseList = new ArrayList<String>();
 
@@ -217,5 +217,4 @@ public class OLAPQueries {
         return false;
     }
 	
-
 }
