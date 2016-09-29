@@ -26,7 +26,6 @@ import javax.swing.table.DefaultTableModel;
 
 import com.ub.cse601.sql.OLAPQueries;
 import javax.swing.SwingConstants;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
 import java.awt.LayoutManager;
 
