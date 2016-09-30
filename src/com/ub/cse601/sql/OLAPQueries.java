@@ -305,6 +305,272 @@ public class OLAPQueries {
 
 	}
 
+
+    public Object[] tstatALLpatientsquery4(String diseasename, String goid) throws SQLException {
+
+
+        Statement stmt = null;
+
+        int count = 0;
+        List<String[]> queryOutput = null;
+        String[] columnNames = null;
+        Object[] output = null;
+
+        try {
+
+            output = new Object[3];
+            queryOutput = new ArrayList<String[]>();
+            StringBuffer sb = new StringBuffer();
+
+
+            String dropv1query = "begin execute immediate 'drop view q4v1'; exception when others then null; end;";
+            String createv1query = null;
+
+            if (goid != null && goid.length() > 0) {
+
+                createv1query = "create view q4v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +12502;
+            }
+
+            else {
+                createv1query = "create view q4v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID";
+            }
+            String selectv1query = "select * from q4v1";
+
+            String dropv2query = "begin execute immediate 'drop view q4v2'; exception when others then null; end;";
+
+            String createv2query = "create view q4v2 as "
+                    + "select q4v1.U_ID,q4v1.GO_ID,q4v1.PB_ID, microarray_fact.S_ID, microarray_fact.EXP "
+                    + "from q4v1, microarray_fact " + "where q4v1.pb_id=microarray_fact.PB_ID";
+
+            String selectv2query = "select * from q4v2";
+
+
+            String dropv3query = "begin execute immediate 'drop view q4vsidexp'; exception when others then null; end;";
+            String createv3query = "create view q4vsidexp as "
+                    + "select q4v2.U_ID, q4v2.GO_ID, q4v2.PB_ID, q4v2.S_ID, q4v2.exp, clinical_fact.P_ID "
+                    + "from q4v2, CLINICAL_FACT " + "where q4v2.S_ID=clinical_fact.S_ID";
+
+            String selectv3query = "select * from q4vsidexp";
+
+
+            String dropv4query = "begin execute immediate 'drop view q4dispid'; exception when others then null; end;";
+
+            String createv4query = "create view q4dispid as " + "select clinical_fact.p_id, disease.name "
+                    + "from clinical_fact, disease " + "where clinical_fact.ds_id = disease.DS_ID";
+
+            String selectv4query = "select * from q4dispid";
+
+
+            String dropv5query = "begin execute immediate 'drop view q4final'; exception when others then null; end;";
+            String createv5query = "create view q4final as "
+                    + "select q4vsidexp.go_id, q4vsidexp.pb_id, q4vsidexp.exp, q4vsidexp.p_id, q4dispid.name "
+                    + "from q4vsidexp, q4dispid " + "where q4vsidexp.P_ID = q4dispid.P_ID";
+            String selectv5query = "select * from q4final";
+
+
+            String dropv6query = "begin execute immediate 'drop view q4ttest'; exception when others then null; end;";
+            String createv6query = "create view q4ttest as "
+                    + "q4final.pb_id, q4final.exp, q4final.p_id, q4final.go_id, q4final.name, "
+                    + "case when q4final.name = '"+diseasename+"' then 0 else 1 end as diseaseval "
+                    + "from q4final";
+            String selectv6query = "select * from q4ttest";
+
+
+            String selectv7query = "select pb_id, "
+                    + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed, "
+                    + "stats_t_test_indep(diseaseval,exp)two_sided_p_value "
+                    + "from q4ttest "
+                    + "group by PB_ID";
+
+            int queryval;
+            stmt = conn.createStatement();
+            queryval = stmt.executeUpdate(dropv1query);
+            queryval = stmt.executeUpdate(createv1query);
+            queryval = stmt.executeUpdate(dropv2query);
+            queryval = stmt.executeUpdate(createv2query);
+            queryval = stmt.executeUpdate(dropv3query);
+            queryval = stmt.executeUpdate(createv3query);
+            queryval = stmt.executeUpdate(dropv4query);
+            queryval = stmt.executeUpdate(createv4query);
+            queryval = stmt.executeUpdate(dropv5query);
+            queryval = stmt.executeUpdate(createv5query);
+            queryval = stmt.executeUpdate(dropv6query);
+            queryval = stmt.executeUpdate(createv6query);
+            ResultSet rs = stmt.executeQuery(selectv7query);
+
+            int colCount = rs.getMetaData().getColumnCount();
+            columnNames = new String[colCount];
+
+            for (int i = 0; i < colCount; i++) {
+                columnNames[i] = rs.getMetaData().getColumnLabel(i + 1);
+            }
+
+            while (rs.next()) {
+                String[] row = new String[colCount];
+                for (int i = 0; i < colCount; i++) {
+                    row[i] = rs.getString(i + 1);
+                }
+                queryOutput.add(row);
+                count++;
+            }
+            output[0] = count;
+            output[1] = columnNames;
+            output[2] = queryOutput;
+
+        } catch (SQLException e) {
+
+            printSQLException(e);
+
+        } finally {
+
+            if (stmt != null) {
+
+                stmt.close();
+
+            }
+
+        }
+
+        return output;
+
+    }
+
+
+    public Object[] fstatALLAMLpatientsquery5(String diseasename1,String diseasename2, String goid) throws SQLException {
+
+
+        Statement stmt = null;
+
+        int count = 0;
+        List<String[]> queryOutput = null;
+        String[] columnNames = null;
+        Object[] output = null;
+
+        try {
+
+            output = new Object[3];
+            queryOutput = new ArrayList<String[]>();
+            StringBuffer sb = new StringBuffer();
+
+
+            String dropv1query = "begin execute immediate 'drop view q5v1'; exception when others then null; end;";
+            String createv1query = null;
+
+            if (goid != null && goid.length() > 0) {
+
+                createv1query = "create view q5v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +7154;
+            }
+
+            else {
+                createv1query = "create view q5v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID";
+            }
+            String selectv1query = "select * from q5v1";
+
+            String dropv2query = "begin execute immediate 'drop view q5v2'; exception when others then null; end;";
+
+            String createv2query = "create view q5v2 as "
+                    + "select q5v1.U_ID,q5v1.GO_ID,q5v1.PB_ID, microarray_fact.S_ID, microarray_fact.EXP "
+                    + "from q5v1, microarray_fact " + "where q5v1.pb_id=microarray_fact.PB_ID";
+
+            String selectv2query = "select * from q5v2";
+
+
+            String dropv3query = "begin execute immediate 'drop view q4vsidexp'; exception when others then null; end;";
+            String createv3query = "create view q5vsidexp as "
+                    + "select q5v2.U_ID, q5v2.GO_ID, q5v2.PB_ID, q5v2.S_ID, q5v2.exp, clinical_fact.P_ID "
+                    + "from q5v2, CLINICAL_FACT " + "where q5v2.S_ID=clinical_fact.S_ID";
+
+            String selectv3query = "select * from q5vsidexp";
+
+
+            String dropv4query = "begin execute immediate 'drop view q5dispid'; exception when others then null; end;";
+
+            String createv4query = "create view q5dispid as " + "select clinical_fact.p_id, disease.name "
+                    + "from clinical_fact, disease " + "where clinical_fact.ds_id = disease.DS_ID";
+
+            String selectv4query = "select * from q5dispid";
+
+
+            String dropv5query = "begin execute immediate 'drop view q5final'; exception when others then null; end;";
+            String createv5query = "create view q5final as "
+                    + "select q5vsidexp.go_id, q5vsidexp.pb_id, q5vsidexp.exp, q5vsidexp.p_id, q5dispid.name "
+                    + "from q5vsidexp, q5dispid " + "where q5vsidexp.P_ID = q5dispid.P_ID";
+            String selectv5query = "select * from q5final";
+
+
+            String dropv6query = "begin execute immediate 'drop view q5ftest'; exception when others then null; end;";
+            String createv6query = "create view q5ftest as "
+                    + "q5final.pb_id, q5final.exp, q5final.p_id, q5final.go_id, q5final.name, "
+                    + "case when q5final.name = '"+diseasename1+"' then 0 else 1 end as diseaseval "
+                    + "from q5final "
+                    + "where q5final.name = '"+diseasename1+"' or q5final.name = '"+diseasename2+"'";
+            String selectv6query = "select * from q5ftest";
+            
+
+            String selectv7query = "select pb_id, "
+                    + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed, "
+                    + "stats_f_test(diseaseval,exp)two_sided_p_value "
+                    + "from q5ftest "
+                    + "group by PB_ID";
+
+            int queryval;
+            stmt = conn.createStatement();
+            queryval = stmt.executeUpdate(dropv1query);
+            queryval = stmt.executeUpdate(createv1query);
+            queryval = stmt.executeUpdate(dropv2query);
+            queryval = stmt.executeUpdate(createv2query);
+            queryval = stmt.executeUpdate(dropv3query);
+            queryval = stmt.executeUpdate(createv3query);
+            queryval = stmt.executeUpdate(dropv4query);
+            queryval = stmt.executeUpdate(createv4query);
+            queryval = stmt.executeUpdate(dropv5query);
+            queryval = stmt.executeUpdate(createv5query);
+            queryval = stmt.executeUpdate(dropv6query);
+            queryval = stmt.executeUpdate(createv6query);
+            ResultSet rs = stmt.executeQuery(selectv7query);
+
+            int colCount = rs.getMetaData().getColumnCount();
+            columnNames = new String[colCount];
+
+            for (int i = 0; i < colCount; i++) {
+                columnNames[i] = rs.getMetaData().getColumnLabel(i + 1);
+            }
+
+            while (rs.next()) {
+                String[] row = new String[colCount];
+                for (int i = 0; i < colCount; i++) {
+                    row[i] = rs.getString(i + 1);
+                }
+                queryOutput.add(row);
+                count++;
+            }
+            output[0] = count;
+            output[1] = columnNames;
+            output[2] = queryOutput;
+
+        } catch (SQLException e) {
+
+            printSQLException(e);
+
+        } finally {
+
+            if (stmt != null) {
+
+                stmt.close();
+
+            }
+
+        }
+
+        return output;
+
+    }
+
+
 	public Map<Integer, String> allDiseaseList() throws SQLException {
 
 		Map<Integer, String> diseaseMap = new HashMap<Integer, String>();
