@@ -114,8 +114,6 @@ public class CentralBiostarWindow {
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("Part 2", null, panel_1, null);
 
-		msgBox = new JLabel("");
-
 		queryLabel = new JLabel("Query");
 
 		queryCombo = new JComboBox();
@@ -302,6 +300,7 @@ public class CentralBiostarWindow {
 				try {
 					msgBox.setText("Executing Query...");
 					executeQuery(queryType);
+					msgBox.setText("Query executed successfully...");
 				} catch (Exception ex) {
 					msgBox.setText("Exception: " + ex);
 				}
@@ -443,21 +442,27 @@ public class CentralBiostarWindow {
 	}
 
 	private void executeQuery(String queryType) throws SQLException {
+		String diseaseName = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
+		List<String[]> rawQueryResults = null;
+		Object[][] queryData = null;
+		DefaultTableModel model = null;
+		Object[] queryResult = null;
 		switch (queryType) {
 		case QUERY_1:
-			msgBox.setText("Executing Query...");
-			String diseaseName = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
-			Object[] queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, null);
-			List<String[]> results = (ArrayList<String[]>) queryResult[2];
-			Object[][] data = OLAPUtilities.convertListToArray(results);
-			DefaultTableModel model = new DefaultTableModel(data, (String[]) queryResult[1]);
-			resultTable.setModel(model);
-			resultCount.setText("Result Count: " + queryResult[0]);
-			msgBox.setText("Query Executed Successfully");
+			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, null);
+			populateTable(queryResult);
 			break;
 		case QUERY_2:
+			String dsType = "";
+			String dsDsc = "";
+			queryResult = olapQueryClient.q2drugsForPatientsWithTumor(diseaseName, dsType, dsDsc);
+			populateTable(queryResult);
 			break;
 		case QUERY_3:
+			String clId = clusterId.getText();
+			String muId = mesureUnitId.getText();
+			queryResult = olapQueryClient.expforALLpatientsquery3(diseaseName, clId, muId);
+			populateTable(queryResult);
 			break;
 		case QUERY_4:
 		case QUERY_5:
@@ -465,5 +470,14 @@ public class CentralBiostarWindow {
 		case QUERY_6:
 			break;
 		}
+	}
+
+	private void populateTable(Object[] queryResult) {
+		List<String[]> rawQueryResults = (ArrayList<String[]>) queryResult[2];
+		Object[][] queryData = OLAPUtilities.convertListToArray(rawQueryResults);
+		DefaultTableModel model = new DefaultTableModel(queryData, (String[]) queryResult[1]);
+		resultTable.setModel(model);
+		resultCount.setText("Result Count: " + queryResult[0]);
+
 	}
 }
