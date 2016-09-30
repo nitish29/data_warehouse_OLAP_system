@@ -465,7 +465,12 @@ public class CentralBiostarWindow {
 			populateTable(queryResult);
 			break;
 		case QUERY_4:
+			String go_id = goId.getText();
+			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, go_id);
+			populateTable(queryResult);
+			break;
 		case QUERY_5:
+
 			break;
 		case QUERY_6:
 			break;
