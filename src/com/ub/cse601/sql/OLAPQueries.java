@@ -194,7 +194,7 @@ public class OLAPQueries {
 			if (clid != null && clid.length() > 0) {
 
 				createv1query = "create view q3clidprobe as " + "select gene_fact.U_ID, gene_fact.CL_ID, probe.PB_ID "
-						+ "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.CL_ID=" + clid;
+						+ "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.CL_ID=" +clid;
 			}
 
 			else {
@@ -228,7 +228,7 @@ public class OLAPQueries {
 			if (diseasename != null && diseasename.length() > 0) {
 				createv4query = "create view q3pidall as " + "select clinical_fact.p_id, disease.ds_id, disease.name "
 						+ "from clinical_fact, disease " + "where clinical_fact.ds_id = disease.DS_ID and disease.name="
-						+ diseasename;
+						+ "'"+diseasename+"'";
 			} else {
 				createv4query = "create view q3pidall as " + "select clinical_fact.p_id, disease.ds_id, disease.name "
 						+ "from clinical_fact, disease " + "where clinical_fact.ds_id = disease.DS_ID";
