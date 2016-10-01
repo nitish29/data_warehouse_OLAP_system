@@ -471,6 +471,9 @@ public class CentralBiostarWindow {
 			populateTable(queryResult);
 			break;
 		case QUERY_5:
+			queryResult = olapQueryClient.fstatALLAMLpatientsquery5();
+			populateTable(queryResult);
+			break;
 
 			break;
 		case QUERY_6:
