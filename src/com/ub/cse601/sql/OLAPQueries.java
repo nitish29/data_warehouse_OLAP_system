@@ -329,7 +329,7 @@ public class OLAPQueries {
             if (goid != null && goid.length() > 0) {
 
                 createv1query = "create view q4v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
-                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +12502;
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +goid;
             }
 
             else {
@@ -372,7 +372,7 @@ public class OLAPQueries {
 
             String dropv6query = "begin execute immediate 'drop view q4ttest'; exception when others then null; end;";
             String createv6query = "create view q4ttest as "
-                    + "q4final.pb_id, q4final.exp, q4final.p_id, q4final.go_id, q4final.name, "
+                    + "select q4final.pb_id, q4final.exp, q4final.p_id, q4final.go_id, q4final.name, "
                     + "case when q4final.name = '"+diseasename+"' then 0 else 1 end as diseaseval "
                     + "from q4final";
             String selectv6query = "select * from q4ttest";
@@ -463,7 +463,7 @@ public class OLAPQueries {
             if (goid != null && goid.length() > 0) {
 
                 createv1query = "create view q5v1 as " + "select gene_fact.U_ID, gene_fact.GO_ID, probe.PB_ID "
-                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +7154;
+                        + "from gene_fact, probe " + "where gene_fact.U_ID=probe.U_ID AND gene_fact.GO_ID=" +goid;
             }
 
             else {
@@ -506,7 +506,7 @@ public class OLAPQueries {
 
             String dropv6query = "begin execute immediate 'drop view q5ftest'; exception when others then null; end;";
             String createv6query = "create view q5ftest as "
-                    + "q5final.pb_id, q5final.exp, q5final.p_id, q5final.go_id, q5final.name, "
+                    + "select q5final.pb_id, q5final.exp, q5final.p_id, q5final.go_id, q5final.name, "
                     + "case when q5final.name = '"+diseasename1+"' then 0 else 1 end as diseaseval "
                     + "from q5final "
                     + "where q5final.name = '"+diseasename1+"' or q5final.name = '"+diseasename2+"'";
