@@ -1,10 +1,10 @@
 package com.ub.cse601.ui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -22,14 +22,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import com.ub.cse601.sql.OLAPQueries;
-import javax.swing.SwingConstants;
-import java.awt.Component;
-import java.awt.LayoutManager;
-
-import javax.swing.ScrollPaneConstants;
 
 public class CentralBiostarWindow {
 
@@ -38,12 +36,12 @@ public class CentralBiostarWindow {
 	private JTextField probeId;
 	private JTextField mesureUnitId;
 	private JTextField goId;
-	private JComboBox queryCombo;
+	private JComboBox<String> queryCombo;
 	private JLabel queryLabel;
 	private JLabel diseaseLabel;
 	private JLabel probeLabel;
 	private JLabel mUnitLabel;
-	private JComboBox diseaseCombo;
+	private JComboBox<String> diseaseCombo;
 	private JLabel clstrLabel;
 	private JLabel goIdLabel;
 	private JButton resetBtn;
@@ -61,22 +59,24 @@ public class CentralBiostarWindow {
 	private static final String QUERY_4 = "Query 4";
 	private static final String QUERY_5 = "Query 5";
 	private static final String QUERY_6 = "Query 6";
-	private JComboBox dis1;
+	private JComboBox<String> dis1;
 	private JLabel lblAnd;
-	private JComboBox dis2;
+	private JComboBox<String> dis2;
 	private JLabel avgCorrLbl;
 	private JLabel statsLabel;
-	private JComboBox statistics;
+	private JComboBox<String> statistics;
 
 	/**
 	 * Create the application.
 	 */
 	public CentralBiostarWindow() {
-		this.msgBox = new JLabel("Initializing app....");
 		try {
 			olapQueryClient = new OLAPQueries();
 			initialize();
 			msgBox.setText("App initialized...Execute Queries Now");
+			UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+			if (defaults.get("Table.alternateRowColor") == null)
+				defaults.put("Table.alternateRowColor", new Color(255, 228, 225));
 
 		} catch (Exception ex) {
 			msgBox.setText("Exception: " + ex);
@@ -101,6 +101,9 @@ public class CentralBiostarWindow {
 		frame = new JFrame();
 		frame.setSize(1200, 800);
 		// frame.setBounds(100, 100, 450, 300);
+		msgBox = new JLabel("Initializing app....");
+		// show frame
+		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
 
@@ -330,8 +333,6 @@ public class CentralBiostarWindow {
 			dis2.insertItemAt(entry.getValue(), entry.getKey());
 
 		}
-		// show frame
-		this.frame.setVisible(true);
 	}
 
 	public void onChangeQuery() {
