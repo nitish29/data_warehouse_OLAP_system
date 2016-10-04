@@ -416,8 +416,8 @@ public class CentralBiostarWindow {
 			statistics.setSelectedIndex(1);
 			statistics.setEditable(false);
 			avgCorrLbl.setVisible(false);
-			dis1.setVisible(false);
-			dis2.setVisible(false);
+			dis1.setVisible(true);
+			dis2.setVisible(true);
 			lblAnd.setVisible(false);
 			break;
 		case QUERY_6:
@@ -444,6 +444,7 @@ public class CentralBiostarWindow {
 
 	private void executeQuery(String queryType) throws SQLException {
 		String diseaseName = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
+		String diseaseName2 = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
 		List<String[]> rawQueryResults = null;
 		Object[][] queryData = null;
 		DefaultTableModel model = null;
@@ -471,11 +472,12 @@ public class CentralBiostarWindow {
 			populateTable(queryResult);
 			break;
 		case QUERY_5:
-			queryResult = olapQueryClient.fstatALLAMLpatientsquery5();
+			String goid = goId.getText();
+			queryResult = olapQueryClient.fstatALLAMLpatientsquery5(diseaseName, diseaseName2, goid);
 			populateTable(queryResult);
 			break;
 
-			break;
+
 		case QUERY_6:
 			break;
 		}
