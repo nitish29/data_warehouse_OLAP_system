@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class DBClient {
 
-	private static final String URL = "jdbc:oracle:thin:@aos.acsu.buffalo.edu:1521/aos.buffalo.edu";
-	private static final String USER_NAME = "nitishgo";
+	private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+	private static final String USER_NAME = "BIOMED_DATA";
 	private static final String PWD = "cse601";
 	private Connection conn = null;
 

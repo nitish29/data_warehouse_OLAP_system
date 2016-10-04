@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -28,6 +29,8 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import com.ub.cse601.sql.OLAPQueries;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 public class CentralBiostarWindow {
 
@@ -65,6 +68,15 @@ public class CentralBiostarWindow {
 	private JLabel avgCorrLbl;
 	private JLabel statsLabel;
 	private JComboBox<String> statistics;
+	private JLabel pIdLbl;
+	private JTextField pIdText;
+	private JLabel kdQuery;
+	JComboBox kdCombo;
+	JLabel kdDisLbl;
+	JComboBox kdDisCombo;
+	JLabel thrsValue;
+	JTextField thrsText;
+	private JPanel panel_4;
 
 	/**
 	 * Create the application.
@@ -115,7 +127,7 @@ public class CentralBiostarWindow {
 		panel.add(tabbedPane);
 
 		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("Part 2", null, panel_1, null);
+		tabbedPane.addTab("Part 2-OLAP Operations", null, panel_1, null);
 
 		queryLabel = new JLabel("Query");
 
@@ -310,35 +322,90 @@ public class CentralBiostarWindow {
 			}
 		});
 		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Part 3", null, panel_2, null);
+		tabbedPane.addTab("Part 3-Knowledge Discovery", null, panel_2, null);
 
-		JLabel lblDisease_1 = new JLabel("Disease");
+		kdQuery = new JLabel("Find What");
+
+		kdCombo = new JComboBox();
+
+		kdDisLbl = new JLabel("Disease");
+
+		kdDisCombo = new JComboBox();
+
+		thrsValue = new JLabel("Threshold P-Value");
+
+		thrsText = new JTextField();
+
+		pIdLbl = new JLabel("Patient Id");
+
+		pIdText = new JTextField();
+		pIdText.setColumns(10);
+
+		panel_4 = new JPanel();
+		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Knowledge Discovery",
+				TitledBorder.LEFT, TitledBorder.TOP, null, new Color(199, 21, 133)));
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
-		gl_panel_2.setHorizontalGroup(
-				gl_panel_2.createParallelGroup(Alignment.LEADING).addGroup(gl_panel_2.createSequentialGroup()
-						.addContainerGap().addComponent(lblDisease_1).addContainerGap(359, Short.MAX_VALUE)));
-		gl_panel_2.setVerticalGroup(
-				gl_panel_2.createParallelGroup(Alignment.LEADING).addGroup(gl_panel_2.createSequentialGroup()
-						.addContainerGap().addComponent(lblDisease_1).addContainerGap(194, Short.MAX_VALUE)));
+		gl_panel_2.setHorizontalGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup().addGap(33)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addComponent(kdQuery)
+								.addComponent(kdDisLbl).addComponent(thrsValue).addComponent(pIdLbl))
+						.addGap(128)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false).addComponent(pIdText)
+								.addComponent(thrsText, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(
+										kdDisCombo, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(kdCombo, 0, 261, Short.MAX_VALUE))
+						.addGap(80).addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(210, Short.MAX_VALUE)));
+		gl_panel_2.setVerticalGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addGroup(gl_panel_2
+				.createSequentialGroup().addGap(26)
+				.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+								Short.MAX_VALUE)
+						.addGroup(Alignment.LEADING, gl_panel_2.createSequentialGroup()
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(kdQuery)
+										.addComponent(kdCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+								.addGap(30)
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING).addComponent(kdDisLbl)
+										.addComponent(kdDisCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+								.addGap(31)
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(thrsValue)
+										.addComponent(thrsText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+								.addGap(29)
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(pIdLbl)
+										.addComponent(pIdText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))))
+				.addContainerGap(519, Short.MAX_VALUE)));
 		panel_2.setLayout(gl_panel_2);
 
 		// populate disease combo
-		dis1.insertItemAt("Select", 0);
-		dis2.insertItemAt("Select", 0);
 		Iterator<Entry<Integer, String>> diseaseMapItr = olapQueryClient.allDiseaseList().entrySet().iterator();
 		while (diseaseMapItr.hasNext()) {
 			Entry<Integer, String> entry = diseaseMapItr.next();
 			diseaseCombo.insertItemAt(entry.getValue(), entry.getKey());
-			dis1.insertItemAt(entry.getValue(), entry.getKey());
-			dis2.insertItemAt(entry.getValue(), entry.getKey());
+			dis1.insertItemAt(entry.getValue(), entry.getKey() - 1);
+			dis2.insertItemAt(entry.getValue(), entry.getKey() - 1);
+			kdDisCombo.insertItemAt(entry.getValue(), entry.getKey() - 1);
 
 		}
+		populateKDQueries(kdCombo);
+		kdDisCombo.setSelectedIndex(1);
+	}
+
+	public void populateKDQueries(JComboBox kdComboBox) {
+		kdComboBox.insertItemAt("T-Statistics", 0);
+		kdComboBox.insertItemAt("F-Statistics", 1);
+		kdComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "T-Statistics", "F-Statistics",
+				"Informative Genes", "Correlation of Informative Genes" }));
 	}
 
 	public void onChangeQuery() {
 		String query = queryCombo.getSelectedItem().toString();
 		switch (query) {
 		case QUERY_1:
+			diseaseCombo.setVisible(true);
 			clusterId.setVisible(false);
 			clstrLabel.setVisible(false);
 			probeId.setVisible(false);
@@ -353,8 +420,10 @@ public class CentralBiostarWindow {
 			dis1.setVisible(false);
 			dis2.setVisible(false);
 			lblAnd.setVisible(false);
+			diseaseLabel.setVisible(true);
 			break;
 		case QUERY_2:
+			diseaseCombo.setVisible(true);
 			clusterId.setVisible(false);
 			clstrLabel.setVisible(false);
 			probeId.setVisible(false);
@@ -369,8 +438,10 @@ public class CentralBiostarWindow {
 			dis1.setVisible(false);
 			dis2.setVisible(false);
 			lblAnd.setVisible(false);
+			diseaseLabel.setVisible(true);
 			break;
 		case QUERY_3:
+			diseaseCombo.setVisible(true);
 			clusterId.setVisible(true);
 			clstrLabel.setVisible(true);
 			mUnitLabel.setVisible(true);
@@ -381,8 +452,10 @@ public class CentralBiostarWindow {
 			dis1.setVisible(false);
 			dis2.setVisible(false);
 			lblAnd.setVisible(false);
+			diseaseLabel.setVisible(true);
 			break;
 		case QUERY_4:
+			diseaseCombo.setVisible(true);
 			clusterId.setVisible(false);
 			clstrLabel.setVisible(false);
 			probeId.setVisible(false);
@@ -401,6 +474,7 @@ public class CentralBiostarWindow {
 			statsLabel.setVisible(true);
 			statistics.setSelectedIndex(0);
 			statistics.setEditable(false);
+			diseaseLabel.setVisible(true);
 			break;
 		case QUERY_5:
 			clusterId.setVisible(false);
@@ -419,6 +493,12 @@ public class CentralBiostarWindow {
 			dis1.setVisible(true);
 			dis2.setVisible(true);
 			lblAnd.setVisible(false);
+			diseaseCombo.setVisible(false);
+			diseaseLabel.setVisible(false);
+			avgCorrLbl.setVisible(true);
+			lblAnd.setVisible(true);
+			dis1.setSelectedIndex(1);
+			dis2.setSelectedIndex(2);
 			break;
 		case QUERY_6:
 			clusterId.setVisible(false);
@@ -432,9 +512,12 @@ public class CentralBiostarWindow {
 			avgCorrLbl.setVisible(true);
 			dis1.setVisible(true);
 			dis2.setVisible(true);
-			dis1.setSelectedIndex(0);
-			dis2.setSelectedIndex(0);
+			dis1.setSelectedIndex(1);
+			dis2.setSelectedIndex(2);
 			lblAnd.setVisible(true);
+			diseaseLabel.setVisible(false);
+			diseaseCombo.setVisible(false);
+
 			break;
 		default:
 			break;
@@ -443,12 +526,15 @@ public class CentralBiostarWindow {
 	}
 
 	private void executeQuery(String queryType) throws SQLException {
-		String diseaseName = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
-		String diseaseName2 = diseaseCombo.getSelectedIndex() == 0 ? "" : diseaseCombo.getSelectedItem().toString();
+		String diseaseName = diseaseCombo.getSelectedItem() == null || diseaseCombo.getSelectedItem() == "All" ? ""
+				: diseaseCombo.getSelectedItem().toString();
+		String disease1 = dis1.getSelectedItem() == null ? "" : dis1.getSelectedItem().toString();
+		String disease2 = dis2.getSelectedItem() == null ? "" : dis2.getSelectedItem().toString();
 		List<String[]> rawQueryResults = null;
 		Object[][] queryData = null;
 		DefaultTableModel model = null;
 		Object[] queryResult = null;
+		String go_id = goId.getText();
 		switch (queryType) {
 		case QUERY_1:
 			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, null);
@@ -467,17 +553,14 @@ public class CentralBiostarWindow {
 			populateTable(queryResult);
 			break;
 		case QUERY_4:
-			String go_id = goId.getText();
 			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, go_id);
 			populateTable(queryResult);
 			break;
 		case QUERY_5:
 			String goid = goId.getText();
-			queryResult = olapQueryClient.fstatALLAMLpatientsquery5(diseaseName, diseaseName2, goid);
+			queryResult = olapQueryClient.fstatALLAMLpatientsquery5(disease1, disease2, goid);
 			populateTable(queryResult);
 			break;
-
-
 		case QUERY_6:
 			break;
 		}
