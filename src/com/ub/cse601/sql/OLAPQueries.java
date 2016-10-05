@@ -421,6 +421,105 @@ public class OLAPQueries {
 
 	}
 
+    public Object[] findInformativeGenes( String diseasename )
+            throws SQLException {
+
+
+        Statement stmt = null;
+
+        int count = 0;
+        List<String[]> queryOutput = null;
+        String[] columnNames = null;
+        Object[] output = null;
+
+        try {
+
+            output = new Object[3];
+            queryOutput = new ArrayList<String[]>();
+            StringBuffer sb = new StringBuffer();
+
+
+            String dropv1query = "begin execute immediate 'drop view part3v1'; exception when others then null; end;";
+            String createv1query = null;
+
+            createv1query = "create view part3v1 as "
+                    + "select gene.U_id, exp, p_id, ds_name, case when ds_name = '" + diseasename + "' then 0 else 1 end as diseaseval "
+                    + "from gene, probe, microarray_fact, PATIENTDISEASESAMPLE "
+                    + "where gene.U_ID = probe.U_ID "
+                    + "and probe.pb_id = microarray_fact.pb_id "
+                    + "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
+
+            String dropv2query = "begin execute immediate 'drop view part3v2'; exception when others then null; end;";
+
+
+            String createv2query = "create view part3v2 as "
+                                    + "select u_id, "
+                                    + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed, "
+                                    + "stats_t_test_indep(diseaseval,exp)two_sided_p_value "
+                                    + "from part3v1 "
+                                    + "group by u_id";
+
+            String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
+
+
+            String createv3query = "create view part3v3 as "
+                    + "select u_id, t_observed, two_sided_p_value, "
+                    + "case when two_sided_p_value < 0.01 then 'informative' else 'non-informative' end as genestat, "
+                    + "case when two_sided_p_value < 0.01 then 1 else 0 end as infogene "
+                    + "from part3v2 "
+                    + "order by genestat";
+
+
+            String selectFinalQuery = "select * from part3v3";
+
+            int queryval;
+            stmt = conn.createStatement();
+            queryval = stmt.executeUpdate(dropv1query);
+            queryval = stmt.executeUpdate(createv1query);
+            queryval = stmt.executeUpdate(dropv2query);
+            queryval = stmt.executeUpdate(createv2query);
+            queryval = stmt.executeUpdate(dropv3query);
+            queryval = stmt.executeUpdate(createv3query);
+
+            ResultSet rs = stmt.executeQuery(selectFinalQuery);
+
+            int colCount = rs.getMetaData().getColumnCount();
+            columnNames = new String[colCount];
+
+            for (int i = 0; i < colCount; i++) {
+                columnNames[i] = rs.getMetaData().getColumnLabel(i + 1);
+            }
+
+            while (rs.next()) {
+                String[] row = new String[colCount];
+                for (int i = 0; i < colCount; i++) {
+                    row[i] = rs.getString(i + 1);
+                }
+                queryOutput.add(row);
+                count++;
+            }
+            output[0] = count;
+            output[1] = columnNames;
+            output[2] = queryOutput;
+
+        } catch (SQLException e) {
+
+            printSQLException(e);
+
+        } finally {
+
+            if (stmt != null) {
+
+                stmt.close();
+
+            }
+
+        }
+
+        return output;
+
+    }
+
 	public Object[] query6Correlation(String diseasename1, String diseasename2, String goid) throws SQLException {
 
 		Statement stmt = null;
@@ -505,6 +604,8 @@ public class OLAPQueries {
 		return output;
 
 	}
+
+
 
 	public Map<Integer, String> allDiseaseList() throws SQLException {
 

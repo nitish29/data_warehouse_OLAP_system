@@ -562,6 +562,8 @@ public class CentralBiostarWindow {
 			populateTable(queryResult);
 			break;
 		case QUERY_6:
+			//queryResult = olapQueryClient.findInformativeGenes("ALL");
+			//populateTable(queryResult);
 			break;
 		}
 	}
