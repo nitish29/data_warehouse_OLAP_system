@@ -543,10 +543,9 @@ public class OLAPQueries {
 
 			ResultSet rs = stmt.executeQuery(selectv1query);
 
-			List<Double> expList1 = new ArrayList<Double>();
-			List<Double> expList2 = new ArrayList<Double>();
 
 			dis1PatientExPList = new HashMap<Double, List<Double>>();
+			dis2PatientExPList = new HashMap<Double,List<Double>>();
 
 			while (rs.next()) {
 				Double pId = rs.getDouble("P_ID");
@@ -559,7 +558,7 @@ public class OLAPQueries {
 					dis1PatientExPList.get(pId).add(expValue);
 				}
 			}
-			if (disease2 != null && disease2.equals(disease1)) {
+			if (disease2 != null && !disease2.equals(disease1)) {
 				String selectv2query = "select P_ID, S_ID, PB_ID, EXP from q6optv1 where DISEASEVAl=1 order by P_ID, S_ID, PB_ID ASC";
 				rs = stmt.executeQuery(selectv2query);
 				while (rs.next()) {
