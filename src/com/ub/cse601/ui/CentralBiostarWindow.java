@@ -851,7 +851,7 @@ public class CentralBiostarWindow {
 			break;
 		case QUERY_4:
 			start = System.currentTimeMillis();
-			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, goIdVal);
+			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, goIdVal,"F Statistics");
 			end = System.currentTimeMillis();
 			populateTable(queryResult, resultTable, resultCount, start, end);
 			break;
@@ -920,14 +920,14 @@ public class CentralBiostarWindow {
 		case QUERY_7:
 			// Map<String, Double> map1 = new HashMap<>();
 			// Map<String, Double> map2 = new HashMap<>();
-			olapQueryClient.findInformativeGenes("ALL");
+			olapQueryClient.findInformativeGenes("ALL", 0.01);
 
 			List<Double> list1 = new ArrayList<Double>();
 			List<Double> list2 = new ArrayList<Double>();
 
 			Double finalpvalue;
 
-			Object[] expData = olapQueryClient.classifynewpatientcorrelation(disease1, "0.01", "P1");
+			Object[] expData = olapQueryClient.classifynewpatientcorrelation(disease1, 0.01, "P1");
 			Map<Double, List<Double>> group1 = (Map<Double, List<Double>>) expData[0];
 			Map<Double, List<Double>> group2 = (Map<Double, List<Double>>) expData[1];
 			Map<String, List<Double>> group3 = (Map<String, List<Double>>) expData[2];

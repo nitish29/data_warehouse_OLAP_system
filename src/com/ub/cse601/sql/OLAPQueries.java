@@ -264,7 +264,7 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] tstatALLpatientsquery4(String diseasename, String goid) throws SQLException {
+	public Object[] tstatALLpatientsquery4(String diseasename, String goid, String stats) throws SQLException {
 
 		Statement stmt = null;
 
@@ -301,19 +301,35 @@ public class OLAPQueries {
 			String selectv2queryungroup = "select " + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
 					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4ttest";
 
-            /*String selectv2querygroupftest = "select pb_id, " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1 " + "group by PB_ID";
+            String selectv2querygroupftest = "select pb_id, " + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
+					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest " + "group by PB_ID";
 
-			String selectv2queryungroupftest = "select " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1";*/
+			String selectv2queryungroupftest = "select " + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
+					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest";
 
             int queryval;
             stmt = conn.createStatement();
             queryval = stmt.executeUpdate(dropv1query);
             queryval = stmt.executeUpdate(createv1query);
 
-			// ResultSet rs = stmt.executeQuery(selectv2query);
-			ResultSet rs = stmt.executeQuery(selectv2queryungroup);
+            ResultSet rs = null;
+
+            if (stats != null && diseasename.length() > 0)
+            {
+                if(stats.equals("T Statistics"))
+                {
+                    rs = stmt.executeQuery(selectv2queryungroup);
+                }
+                else if(stats.equals("F Statistics"))
+                {
+                    rs = stmt.executeQuery(selectv2queryungroupftest);
+                }
+            }
+
+			// ResultSet rs = stmt.executeQuery(selectv2querygroup);
+			//ResultSet rs = stmt.executeQuery(selectv2queryungroup);
+            // ResultSet rs = stmt.executeQuery(selectv2querygroupftest);
+            //ResultSet rs = stmt.executeQuery(selectv2queryungroupftest);
 
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
@@ -447,7 +463,7 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] findInformativeGenes(String diseasename) throws SQLException {
+	public Object[] findInformativeGenes(String diseasename, double pvalue) throws SQLException {
 
 		Statement stmt = null;
 
@@ -484,8 +500,8 @@ public class OLAPQueries {
 			String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
 
 			String createv3query = "create view part3v3 as " + "select u_id, t_observed, two_sided_p_value, "
-					+ "case when two_sided_p_value < 0.01 then 'informative' else 'non-informative' end as genestat, "
-					+ "case when two_sided_p_value < 0.01 then 1 else 0 end as infogene " + "from part3v2 "
+					+ "case when two_sided_p_value < " +pvalue+ " then 'informative' else 'non-informative' end as genestat, "
+					+ "case when two_sided_p_value < " +pvalue+ " then 1 else 0 end as infogene " + "from part3v2 "
 					+ "order by genestat";
 
 			String selectFinalQuery = "select * from part3v3";
@@ -496,8 +512,8 @@ public class OLAPQueries {
 			queryval = stmt.executeUpdate(createv1query);
 			queryval = stmt.executeUpdate(dropv2query);
 			queryval = stmt.executeUpdate(createv2query);
-			// queryval = stmt.executeUpdate(dropv3query);
-			// queryval = stmt.executeUpdate(createv3query);
+			queryval = stmt.executeUpdate(dropv3query);
+			queryval = stmt.executeUpdate(createv3query);
 
 			ResultSet rs = stmt.executeQuery(selectFinalQuery);
 
@@ -538,7 +554,7 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] classifynewpatientcorrelation(String diseasename, String pvalue, String newpatient)
+	public Object[] classifynewpatientcorrelation(String diseasename, double pvalue, String newpatient)
 			throws SQLException {
 
 		Statement stmt = null;
@@ -563,13 +579,13 @@ public class OLAPQueries {
 
 			createv1query = "create view part3v4 as " + "select part3v2.u_id, ds_name, exp, p_id "
 					+ "from part3v2, part3v1 " + "where part3v1.u_id = part3v2.U_ID "
-					+ "and part3v2.two_sided_p_value < 0.01 and ds_name = 'ALL' " + "order by p_id, u_id";
+					+ "and part3v2.two_sided_p_value < "+pvalue+" and ds_name = '"+diseasename+"' " + "order by p_id, u_id";
 
 			String selectv1query = "select * from part3v4";
 
 			String dropv2query = "begin execute immediate 'drop view part3v5'; exception when others then null; end;";
 
-			String createv2query = "create view part3v5 as " + "select unique(testpatients.u_id), P1 as p1_exp "
+			String createv2query = "create view part3v5 as " + "select unique(testpatients.u_id), "+newpatient+" as "+newpatient+"_exp "
 					+ "from testpatients, part3v4 " + "where part3v4.u_id = testpatients.u_id " + "order by u_id";
 
 			String selectv2query = "select * from part3v5";
@@ -579,7 +595,7 @@ public class OLAPQueries {
 
 			createv3query = "create view part3v6 as " + "select part3v2.u_id, ds_name, exp, p_id "
 					+ "from part3v2, part3v1 " + "where part3v1.u_id = part3v2.U_ID "
-					+ "and part3v2.two_sided_p_value < 0.01 and ds_name != 'ALL' " + "order by p_id, u_id";
+					+ "and part3v2.two_sided_p_value < "+pvalue+" and ds_name != '"+diseasename+"' " + "order by p_id, u_id";
 
 			String selectv3query = "select * from part3v6";
 
