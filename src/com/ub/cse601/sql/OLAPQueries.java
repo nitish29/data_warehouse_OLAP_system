@@ -356,7 +356,7 @@ public class OLAPQueries {
 						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE " + "where gene_fact.GO_ID ="
 						+ goid + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
 						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID "
-						+ "and (patientdiseasesample.ds_name = 'ALL' " + "or patientdiseasesample.ds_name = 'AML' "
+						+ "and (patientdiseasesample.ds_name = 'ALL' " + "or patientdiseasesample.ds_name = 'AML') "
 						+ "or patientdiseasesample.ds_name = 'Breast tumor' "
 						+ "or patientdiseasesample.ds_name = 'Colon tumor')";
 
@@ -443,11 +443,15 @@ public class OLAPQueries {
 					+ "and probe.pb_id = microarray_fact.pb_id "
 					+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
 
+            String selectv1query = "select * from part3v1";
+
 			String dropv2query = "begin execute immediate 'drop view part3v2'; exception when others then null; end;";
 
 			String createv2query = "create view part3v2 as " + "select u_id, "
 					+ "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed, "
 					+ "stats_t_test_indep(diseaseval,exp)two_sided_p_value " + "from part3v1 " + "group by u_id";
+
+            String selectv2query = "select * from part3v2";
 
 			String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
 
@@ -464,8 +468,8 @@ public class OLAPQueries {
 			queryval = stmt.executeUpdate(createv1query);
 			queryval = stmt.executeUpdate(dropv2query);
 			queryval = stmt.executeUpdate(createv2query);
-			queryval = stmt.executeUpdate(dropv3query);
-			queryval = stmt.executeUpdate(createv3query);
+			//queryval = stmt.executeUpdate(dropv3query);
+			//queryval = stmt.executeUpdate(createv3query);
 
 			ResultSet rs = stmt.executeQuery(selectFinalQuery);
 
@@ -505,6 +509,166 @@ public class OLAPQueries {
 		return output;
 
 	}
+
+    public Object[] classifynewpatientcorrelation(String diseasename, String pvalue, String newpatient) throws SQLException {
+
+        Statement stmt = null;
+        Map<Double, List<Double>> dis1PatientExPList = null;
+        Map<Double, List<Double>> dis2PatientExPList = null;
+        Map<String, List<Double>> dis3PatientExPList = null;
+        Object[] expData = null;
+
+        int count = 0;
+        List<String[]> queryOutput = null;
+        String[] columnNames = null;
+        Object[] output = null;
+
+        try {
+
+            output = new Object[3];
+            queryOutput = new ArrayList<String[]>();
+            StringBuffer sb = new StringBuffer();
+
+            String dropv1query = "begin execute immediate 'drop view part3v4'; exception when others then null; end;";
+            String createv1query = null;
+
+            createv1query = "create view part3v4 as "
+                    + "select part3v2.u_id, ds_name, exp, p_id "
+                    + "from part3v2, part3v1 "
+                    + "where part3v1.u_id = part3v2.U_ID "
+                    + "and part3v2.two_sided_p_value < 0.01 and ds_name = 'ALL' "
+                    + "order by p_id, u_id";
+
+            String selectv1query = "select * from part3v4";
+
+            String dropv2query = "begin execute immediate 'drop view part3v5'; exception when others then null; end;";
+
+            String createv2query = "create view part3v5 as "
+                    + "select unique(testpatients.u_id), P1 as p1_exp "
+                    + "from testpatients, part3v4 "
+                    + "where part3v4.u_id = testpatients.u_id "
+                    + "order by u_id";
+
+            String selectv2query = "select * from part3v5";
+
+            String dropv3query = "begin execute immediate 'drop view part3v6'; exception when others then null; end;";
+            String createv3query = null;
+
+            createv3query = "create view part3v6 as "
+                    + "select part3v2.u_id, ds_name, exp, p_id "
+                    + "from part3v2, part3v1 "
+                    + "where part3v1.u_id = part3v2.U_ID "
+                    + "and part3v2.two_sided_p_value < 0.01 and ds_name != 'ALL' "
+                    + "order by p_id, u_id";
+
+            String selectv3query = "select * from part3v6";
+
+
+            int queryval;
+            stmt = conn.createStatement();
+
+            queryval = stmt.executeUpdate(dropv1query);
+            queryval = stmt.executeUpdate(createv1query);
+
+            queryval = stmt.executeUpdate(dropv2query);
+            queryval = stmt.executeUpdate(createv2query);
+
+            queryval = stmt.executeUpdate(dropv3query);
+            queryval = stmt.executeUpdate(createv3query);
+
+            dis1PatientExPList = new HashMap<Double, List<Double>>();
+            dis2PatientExPList = new HashMap<Double,List<Double>>();
+            dis3PatientExPList = new HashMap<String,List<Double>>();
+
+            ResultSet rs = stmt.executeQuery(selectv1query);
+
+            while (rs.next()) {
+                Double pId = rs.getDouble("p_id");
+                Double expValue = rs.getDouble("EXP");
+                if (dis1PatientExPList.get(pId) == null) {
+                    List<Double> expList = new ArrayList<Double>();
+                    expList.add(expValue);
+                    dis1PatientExPList.put(pId, expList);
+                } else {
+                    dis1PatientExPList.get(pId).add(expValue);
+                }
+            }
+
+            rs = stmt.executeQuery(selectv3query);
+
+            while (rs.next()) {
+                Double pId = rs.getDouble("p_id");
+                Double expValue = rs.getDouble("EXP");
+                if (dis2PatientExPList.get(pId) == null) {
+                    List<Double> expList = new ArrayList<Double>();
+                    expList.add(expValue);
+                    dis2PatientExPList.put(pId, expList);
+                } else {
+                    dis2PatientExPList.get(pId).add(expValue);
+                }
+            }
+
+            if (newpatient != null) {
+                rs = stmt.executeQuery(selectv2query);
+                String pId = newpatient+"_exp";
+                while (rs.next()) {
+                    Double expValue = rs.getDouble(newpatient+"_exp");
+                    if (dis3PatientExPList.get(pId) == null) {
+                        List<Double> expList = new ArrayList<Double>();
+                        expList.add(expValue);
+                        dis3PatientExPList.put(pId, expList);
+                    } else {
+                        dis3PatientExPList.get(pId).add(expValue);
+                    }
+                }
+
+            }
+
+            expData = new Object[3];
+            expData[0] = dis1PatientExPList;
+            expData[1] = dis2PatientExPList;
+            expData[2] = dis3PatientExPList;
+
+
+            /*int colCount = rs.getMetaData().getColumnCount();
+            columnNames = new String[colCount];
+
+            for (int i = 0; i < colCount; i++) {
+                columnNames[i] = rs.getMetaData().getColumnLabel(i + 1);
+            }
+
+            while (rs.next()) {
+                String[] row = new String[colCount];
+                for (int i = 0; i < colCount; i++) {
+                    row[i] = rs.getString(i + 1);
+                }
+                queryOutput.add(row);
+                count++;
+            }
+            output[0] = count;
+            output[1] = columnNames;
+            output[2] = queryOutput;*/
+
+        } catch (SQLException e) {
+
+            printSQLException(e);
+
+        } finally {
+
+            if (stmt != null) {
+
+                stmt.close();
+
+            }
+
+        }
+
+        return expData;
+
+    }
+
+
+
 
 	public Object[] query6Correlation(String disease1, String disease2, String goId) throws SQLException {
 
@@ -706,10 +870,8 @@ public class OLAPQueries {
 			return true;
 
 		// 42Y55: Table already exists in schema
-		if (sqlState.equalsIgnoreCase("42Y55"))
-			return true;
+        return sqlState.equalsIgnoreCase("42Y55");
 
-		return false;
-	}
+    }
 
 }

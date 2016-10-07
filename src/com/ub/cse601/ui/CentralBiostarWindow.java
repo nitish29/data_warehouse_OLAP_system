@@ -4,12 +4,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.OptionalDouble;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -34,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 import com.ub.cse601.sql.OLAPQueries;
+import org.apache.commons.math3.stat.inference.TTest;
 
 public class CentralBiostarWindow {
 
@@ -65,6 +62,8 @@ public class CentralBiostarWindow {
 	private static final String QUERY_4 = "Query 4";
 	private static final String QUERY_5 = "Query 5";
 	private static final String QUERY_6 = "Query 6";
+    private static final String QUERY_7 = "Query 7";
+    private static final String QUERY_8 = "Query 8";
 	private JComboBox<String> dis1;
 	private JLabel lblAnd;
 	private JComboBox<String> dis2;
@@ -590,6 +589,7 @@ public class CentralBiostarWindow {
 		DefaultTableModel model = null;
 		Object[] queryResult = null;
 		String goIdVal = goId.getText();
+        queryType = QUERY_7;
 		switch (queryType) {
 		case QUERY_1:
 			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, null);
@@ -642,10 +642,69 @@ public class CentralBiostarWindow {
 			queryResultObj[1] = columnNames;
 			queryResultObj[2] = corrlResult;
 			populateTable(queryResultObj);
+            break;
+
+        case QUERY_7:
+            //Map<String, Double> map1 = new HashMap<>();
+            //Map<String, Double> map2 = new HashMap<>();
+            olapQueryClient.findInformativeGenes("ALL");
+
+            List<Double> list1 = new ArrayList<Double>();
+            List<Double> list2 = new ArrayList<Double>();
+
+            Double finalpvalue;
+
+            Object[] expData = olapQueryClient.classifynewpatientcorrelation(disease1, "0.01", "P1" );
+            Map<Double, List<Double>> group1 = (Map<Double, List<Double>>) expData[0];
+            Map<Double, List<Double>> group2 = (Map<Double, List<Double>>) expData[1];
+            Map<String, List<Double>> group3 = (Map<String, List<Double>>) expData[2];
+
+            list1 = findcorr(group1,group3);
+            list2 = findcorr(group2, group3);
+
+            double[] list1toarr = list1.stream().mapToDouble(Double::doubleValue).toArray();
+            double[] list2toarr = list2.stream().mapToDouble(Double::doubleValue).toArray();
+
+            finalpvalue = new TTest().homoscedasticTTest(list1toarr,list2toarr);
+
+            System.out.print(finalpvalue);
+
+            if(finalpvalue < 0.01)
+            {
+                System.out.print("New Patient has ALL");
+            }
+            else
+            {
+                System.out.print("New Patient does not have ALL");
+            }
+
+
+            /*String[] columnNames = new String[] { "DISEASE_GROUP_1", "DISEASE_GROUP_2", "AVG_CORRELATION" };
+            List<String[]> corrlResult = new ArrayList<String[]>();
+            corrlResult.add(new String[] { disease1, disease2, new Double(avgCorrl).toString() });
+            Object[] queryResultObj = new Object[3];
+            queryResultObj[0] = 1;
+            queryResultObj[1] = columnNames;
+            queryResultObj[2] = corrlResult;
+            populateTable(queryResultObj);
+            */
+            break;
 		}
 	}
 
-	private void populateTable(Object[] queryResult) {
+
+
+    private List<Double> findcorr(Map<Double, List<Double>> group1, Map<String, List<Double>> group3) {
+
+        List group1list = new ArrayList<Double>();
+
+        List newplist = group3.entrySet().iterator().next().getValue();
+        group1.forEach((Double d, List list) -> group1list.add(calculateCorrelation(list, newplist)));
+
+        return group1list;
+    }
+
+    private void populateTable(Object[] queryResult) {
 		List<String[]> rawQueryResults = (ArrayList<String[]>) queryResult[2];
 		Object[][] queryData = OLAPUtilities.convertListToArray(rawQueryResults);
 		DefaultTableModel model = new DefaultTableModel(queryData, (String[]) queryResult[1]);

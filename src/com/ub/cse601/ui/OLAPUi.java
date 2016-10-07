@@ -16,6 +16,7 @@ public class OLAPUi {
 			public void run() {
 				try {
 					CentralBiostarWindow window = new CentralBiostarWindow();
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
