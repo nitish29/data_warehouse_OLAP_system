@@ -23,9 +23,10 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] queryForTumorALLPatients(String diseaseName, String diseaseType, String diseaseDesc) throws SQLException {
+	public Object[] queryForTumorALLPatients(String diseaseName, String diseaseType, String diseaseDesc)
+			throws SQLException {
 
-		PreparedStatement stmt = null;
+		Statement stmt = null;
 		int count = 0;
 		List<String[]> queryOutput = null;
 		String[] columnNames = null;
@@ -37,32 +38,22 @@ public class OLAPQueries {
 			StringBuilder query = new StringBuilder();
 			query.append(
 					"select cf.P_ID as PATIENT_ID, ds.name as DISEASE_NAME, ds.type as DISEASE_TYPE, ds.description as DISEASE_DESC "
-                   +"from clinical_fact cf, disease ds where cf.DS_ID=ds.DS_ID");
+							+ "from clinical_fact cf, disease ds where cf.DS_ID=ds.DS_ID");
 			if (diseaseName != null && diseaseName.length() > 0) {
-                query.append(" AND ds.name=?");
-            }
-            if (diseaseName != null && diseaseType.length() > 0) {
-                query.append(" AND ds.type=?");
-            }
-            if (diseaseName != null && diseaseDesc.length() > 0) {
-                query.append(" AND ds.description=?");
-            }
+				query.append(" AND ds.name='" + diseaseName + "'");
+			}
+			if (diseaseType != null && diseaseType.length() > 0) {
+				query.append(" AND ds.type='" + diseaseType + "'");
+			}
+			if (diseaseDesc != null && diseaseDesc.length() > 0) {
+				query.append(" AND ds.description='" + diseaseDesc + "'");
+			}
 
 			// query.append(" and ds.type='leukemia' and ds.description='tumor'
 			// order by cf.P_ID ASC");
 			query.append(" order by cf.P_ID ASC");
-
-			stmt = conn.prepareStatement(query.toString());
-			if (diseaseName != null && diseaseName.length() > 0) {
-				stmt.setString(1, diseaseName);
-			}
-            if (diseaseType != null && diseaseType.length() > 0) {
-                stmt.setString(2, diseaseType);
-            }
-            if (diseaseDesc != null && diseaseDesc.length() > 0) {
-                stmt.setString(3, diseaseDesc);
-            }
-			ResultSet rs = stmt.executeQuery();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query.toString());
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
 
@@ -102,7 +93,7 @@ public class OLAPQueries {
 
 		// ArrayList<String> drugList = new ArrayList<String>();
 
-		PreparedStatement stmt = null;
+		Statement stmt = null;
 
 		int count = 0;
 		List<String[]> queryOutput = null;
@@ -117,26 +108,17 @@ public class OLAPQueries {
 			query.append(
 					"select drug.dr_id as DRUG_ID, drug.name as DRUG_NAME, drug.type as DRUG_TYPE,disease.name as DISEASE_NAME, disease.type DISEASE_TYPE, disease.DESCRIPTION as DISEASE_DESCRIPTION from drug, clinical_fact,disease where clinical_fact.DR_ID=drug.DR_ID AND clinical_fact.DS_ID=disease.DS_ID");
 			if (disease != null && disease.length() > 0) {
-				query.append(" AND disease.name=?");
+				query.append(" AND disease.name='" + disease + "'");
 			}
 			if (dsType != null && dsType.length() > 0) {
-				query.append(" AND disease.type=?");
+				query.append(" AND disease.type='" + dsType + "'");
 			}
 			if (diseaseDsc != null && diseaseDsc.length() > 0) {
-				query.append(" AND disease.description=?");
+				query.append(" AND disease.description='" + diseaseDsc + "'");
 			}
 			query.append(" order by drug.type ASC");
-			stmt = conn.prepareStatement(query.toString());
-			if (disease != null && disease.length() > 0) {
-				stmt.setString(1, disease);
-			}
-			if (dsType != null && dsType.length() > 0) {
-				stmt.setString(2, dsType);
-			}
-			if (diseaseDsc != null && diseaseDsc.length() > 0) {
-				stmt.setString(3, diseaseDsc);
-			}
-			ResultSet rs = stmt.executeQuery();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query.toString());
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
 
@@ -286,11 +268,18 @@ public class OLAPQueries {
 			if (goid != null && goid.length() > 0) {
 
 				createv1query = "create view q4optv1 as "
-						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename + "'"
-                        + " then 0 else 1 end as diseaseval "
-						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE "
-                        + "where gene_fact.GO_ID =" + goid
-                        + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
+						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename
+						+ "'" + " then 0 else 1 end as diseaseval "
+						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE " + "where gene_fact.GO_ID ="
+						+ goid + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
+						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
+			}
+			else{
+				createv1query = "create view q4optv1 as "
+						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename
+						+ "'" + " then 0 else 1 end as diseaseval "
+						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE " + "where "
+						+ " gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
 						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
 			}
 
@@ -301,35 +290,32 @@ public class OLAPQueries {
 			String selectv2queryungroup = "select " + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
 					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4ttest";
 
-            String selectv2querygroupftest = "select pb_id, " + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
+			String selectv2querygroupftest = "select pb_id, "
+					+ "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
 					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest " + "group by PB_ID";
 
 			String selectv2queryungroupftest = "select " + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
 					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest";
 
-            int queryval;
-            stmt = conn.createStatement();
-            queryval = stmt.executeUpdate(dropv1query);
-            queryval = stmt.executeUpdate(createv1query);
+			int queryval;
+			stmt = conn.createStatement();
+			queryval = stmt.executeUpdate(dropv1query);
+			queryval = stmt.executeUpdate(createv1query);
 
-            ResultSet rs = null;
+			ResultSet rs = null;
 
-            if (stats != null && diseasename.length() > 0)
-            {
-                if(stats.equals("T Statistics"))
-                {
-                    rs = stmt.executeQuery(selectv2queryungroup);
-                }
-                else if(stats.equals("F Statistics"))
-                {
-                    rs = stmt.executeQuery(selectv2queryungroupftest);
-                }
-            }
+			if (stats != null && stats.length() > 0) {
+				if (stats.equals("T Statistics")) {
+					rs = stmt.executeQuery(selectv2queryungroup);
+				} else if (stats.equals("F Statistics")) {
+					rs = stmt.executeQuery(selectv2queryungroupftest);
+				}
+			}
 
 			// ResultSet rs = stmt.executeQuery(selectv2querygroup);
-			//ResultSet rs = stmt.executeQuery(selectv2queryungroup);
-            // ResultSet rs = stmt.executeQuery(selectv2querygroupftest);
-            //ResultSet rs = stmt.executeQuery(selectv2queryungroupftest);
+			// ResultSet rs = stmt.executeQuery(selectv2queryungroup);
+			// ResultSet rs = stmt.executeQuery(selectv2querygroupftest);
+			// ResultSet rs = stmt.executeQuery(selectv2queryungroupftest);
 
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
@@ -406,9 +392,7 @@ public class OLAPQueries {
 					createv1query.append(")");
 				}
 
-
 			}
-
 
 			String selectv2querygroupanova = "select pb_id, " + "stats_one_way_anova(ds_name,exp, 'F_RATIO')f_ratio, "
 					+ "stats_one_way_anova(ds_name,exp,'SIG')p_value " + "from q5optv1 " + "group by PB_ID";
@@ -424,7 +408,7 @@ public class OLAPQueries {
 			// ResultSet rs = stmt.executeQuery(selectv5query);
 			ResultSet rs = stmt.executeQuery(selectv2queryungroupanova);
 
-            int colCount = rs.getMetaData().getColumnCount();
+			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
 
 			for (int i = 0; i < colCount; i++) {
@@ -500,9 +484,9 @@ public class OLAPQueries {
 			String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
 
 			String createv3query = "create view part3v3 as " + "select u_id, t_observed, two_sided_p_value, "
-					+ "case when two_sided_p_value < " +pvalue+ " then 'informative' else 'non-informative' end as genestat, "
-					+ "case when two_sided_p_value < " +pvalue+ " then 1 else 0 end as infogene " + "from part3v2 "
-					+ "order by genestat";
+					+ "case when two_sided_p_value < " + pvalue
+					+ " then 'informative' else 'non-informative' end as genestat, " + "case when two_sided_p_value < "
+					+ pvalue + " then 1 else 0 end as infogene " + "from part3v2 " + "order by genestat";
 
 			String selectFinalQuery = "select * from part3v3";
 
@@ -579,14 +563,16 @@ public class OLAPQueries {
 
 			createv1query = "create view part3v4 as " + "select part3v2.u_id, ds_name, exp, p_id "
 					+ "from part3v2, part3v1 " + "where part3v1.u_id = part3v2.U_ID "
-					+ "and part3v2.two_sided_p_value < "+pvalue+" and ds_name = '"+diseasename+"' " + "order by p_id, u_id";
+					+ "and part3v2.two_sided_p_value < " + pvalue + " and ds_name = '" + diseasename + "' "
+					+ "order by p_id, u_id";
 
 			String selectv1query = "select * from part3v4";
 
 			String dropv2query = "begin execute immediate 'drop view part3v5'; exception when others then null; end;";
 
-			String createv2query = "create view part3v5 as " + "select unique(testpatients.u_id), "+newpatient+" as "+newpatient+"_exp "
-					+ "from testpatients, part3v4 " + "where part3v4.u_id = testpatients.u_id " + "order by u_id";
+			String createv2query = "create view part3v5 as " + "select unique(testpatients.u_id), " + newpatient
+					+ " as " + newpatient + "_exp " + "from testpatients, part3v4 "
+					+ "where part3v4.u_id = testpatients.u_id " + "order by u_id";
 
 			String selectv2query = "select * from part3v5";
 
@@ -595,7 +581,8 @@ public class OLAPQueries {
 
 			createv3query = "create view part3v6 as " + "select part3v2.u_id, ds_name, exp, p_id "
 					+ "from part3v2, part3v1 " + "where part3v1.u_id = part3v2.U_ID "
-					+ "and part3v2.two_sided_p_value < "+pvalue+" and ds_name != '"+diseasename+"' " + "order by p_id, u_id";
+					+ "and part3v2.two_sided_p_value < " + pvalue + " and ds_name != '" + diseasename + "' "
+					+ "order by p_id, u_id";
 
 			String selectv3query = "select * from part3v6";
 
@@ -895,6 +882,80 @@ public class OLAPQueries {
 
 		// 42Y55: Table already exists in schema
 		return sqlState.equalsIgnoreCase("42Y55");
+
+	}
+
+	public Map<Integer, String> getAllDiseaseTypes() throws SQLException {
+		Map<Integer, String> diseaseTypes = new HashMap<Integer, String>();
+
+		Statement stmt = null;
+
+		try {
+			int count = 1;
+			String query = "select distinct(disease.type) as DS_TYPE from disease order by DS_TYPE ASC";
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+
+			while (rs.next()) {
+
+				String type = rs.getString("DS_TYPE");
+				Integer id = count++;
+				diseaseTypes.put(id, type);
+
+			}
+
+		} catch (SQLException e) {
+
+			printSQLException(e);
+
+		} finally {
+
+			if (stmt != null) {
+
+				stmt.close();
+
+			}
+
+		}
+
+		return diseaseTypes;
+
+	}
+
+	public Map<Integer, String> getAllDiseaseDesc() throws SQLException {
+		Map<Integer, String> diseaseDescMap = new HashMap<Integer, String>();
+
+		Statement stmt = null;
+
+		try {
+			int count = 1;
+			String query = "select distinct(disease.description) as DS_DESC from disease order by DS_DESC ASC";
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+
+			while (rs.next()) {
+
+				String type = rs.getString("DS_DESC");
+				Integer id = count++;
+				diseaseDescMap.put(id, type);
+
+			}
+
+		} catch (SQLException e) {
+
+			printSQLException(e);
+
+		} finally {
+
+			if (stmt != null) {
+
+				stmt.close();
+
+			}
+
+		}
+
+		return diseaseDescMap;
 
 	}
 

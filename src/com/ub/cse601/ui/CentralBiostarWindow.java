@@ -101,6 +101,10 @@ public class CentralBiostarWindow {
 	private JCheckBox dis5Chk;
 	private JCheckBox dis6Chk;
 	private JLabel queryTime;
+	private JComboBox disDscCombo;
+	JLabel disType;
+	JLabel disDesc;
+	JComboBox disTypCombo;
 
 	/**
 	 * Create the application.
@@ -237,6 +241,13 @@ public class CentralBiostarWindow {
 		dis5Chk = new JCheckBox("Giloblastome");
 
 		dis6Chk = new JCheckBox("Flu");
+
+		disTypCombo = new JComboBox();
+		disType = new JLabel("Type");
+		populateDiseaseTypeCombo();
+		disDscCombo = new JComboBox();
+		populateDiseaseDescCombo();
+		disDesc = new JLabel("Description");
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1
 				.setHorizontalGroup(
@@ -283,97 +294,147 @@ public class CentralBiostarWindow {
 																		.addPreferredGap(ComponentPlacement.RELATED)
 																		.addComponent(dis2, GroupLayout.PREFERRED_SIZE,
 																				83, GroupLayout.PREFERRED_SIZE)))
-														.addGroup(
-																gl_panel_1.createParallelGroup(Alignment.LEADING)
-																		.addGroup(gl_panel_1.createSequentialGroup()
-																				.addGap(96).addComponent(chlkBoxLbl)
-																				.addGap(18)
+														.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+																.addGroup(gl_panel_1.createSequentialGroup().addGap(50)
+																		.addComponent(disType).addGap(18)
+																		.addComponent(disTypCombo,
+																				GroupLayout.PREFERRED_SIZE, 147,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addComponent(disDesc)
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addComponent(disDscCombo, 0, 157,
+																				Short.MAX_VALUE)
+																		.addGap(188))
+																.addGroup(gl_panel_1.createSequentialGroup()
+																		.addGroup(gl_panel_1
+																				.createParallelGroup(Alignment.LEADING)
 																				.addGroup(gl_panel_1
-																						.createParallelGroup(
-																								Alignment.LEADING)
-																						.addComponent(dis3Chk)
-																						.addComponent(dis2Chk)
-																						.addComponent(dis1Chk))
-																				.addGap(38)
+																						.createSequentialGroup()
+																						.addGap(37)
+																						.addGroup(gl_panel_1
+																								.createParallelGroup(
+																										Alignment.LEADING)
+																								.addComponent(errorMsg)
+																								.addComponent(
+																										queryDesc)))
 																				.addGroup(gl_panel_1
-																						.createParallelGroup(
-																								Alignment.LEADING)
-																						.addComponent(dis5Chk)
-																						.addComponent(dis6Chk)
-																						.addComponent(dis4Chk)))
-																		.addGroup(gl_panel_1.createSequentialGroup()
-																				.addGap(37).addGroup(gl_panel_1
-																						.createParallelGroup(
-																								Alignment.LEADING)
-																						.addComponent(errorMsg)
-																						.addComponent(queryDesc))))
-														.addGap(376))
+																						.createSequentialGroup()
+																						.addGap(96)
+																						.addComponent(chlkBoxLbl)
+																						.addGap(18)
+																						.addGroup(gl_panel_1
+																								.createParallelGroup(
+																										Alignment.LEADING)
+																								.addComponent(dis3Chk)
+																								.addComponent(dis1Chk)
+																								.addComponent(dis2Chk))
+																						.addGap(38)
+																						.addGroup(gl_panel_1
+																								.createParallelGroup(
+																										Alignment.LEADING)
+																								.addComponent(dis5Chk)
+																								.addComponent(dis6Chk)
+																								.addComponent(
+																										dis4Chk))))
+																		.addPreferredGap(ComponentPlacement.RELATED, 86,
+																				Short.MAX_VALUE))))
 												.addComponent(msgBox).addComponent(panel_3, GroupLayout.PREFERRED_SIZE,
 														948, GroupLayout.PREFERRED_SIZE))
 										.addContainerGap()));
-		gl_panel_1.setVerticalGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup().addGap(14).addComponent(errorMsg)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE).addComponent(queryLabel)
-								.addComponent(queryCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(queryDesc))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE).addComponent(diseaseLabel)
-								.addComponent(diseaseCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(clstrLabel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-								.addComponent(clusterId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE).addComponent(probeLabel)
-								.addComponent(probeId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING).addComponent(mUnitLabel)
-								.addComponent(mesureUnitId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(
-								gl_panel_1
-										.createParallelGroup(
-												Alignment.LEADING)
-										.addGroup(gl_panel_1.createSequentialGroup().addGroup(gl_panel_1
-												.createParallelGroup(Alignment.LEADING)
-												.addGroup(gl_panel_1.createSequentialGroup().addGroup(gl_panel_1
-														.createParallelGroup(Alignment.BASELINE)
-														.addComponent(goId, GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-														.addComponent(dis1Chk))
-														.addPreferredGap(ComponentPlacement.RELATED)
-														.addComponent(statistics, GroupLayout.PREFERRED_SIZE,
-																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGroup(gl_panel_1.createSequentialGroup().addComponent(goIdLabel)
-														.addPreferredGap(ComponentPlacement.UNRELATED)
-														.addComponent(statsLabel))
-												.addComponent(chlkBoxLbl, Alignment.TRAILING))
+		gl_panel_1
+				.setVerticalGroup(
+						gl_panel_1
+								.createParallelGroup(
+										Alignment.LEADING)
+								.addGroup(
+										gl_panel_1.createSequentialGroup().addGap(14).addComponent(errorMsg)
 												.addPreferredGap(ComponentPlacement.RELATED)
 												.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-														.addComponent(dis1, GroupLayout.PREFERRED_SIZE,
+														.addComponent(queryLabel)
+														.addComponent(queryCombo, GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-														.addComponent(dis2, GroupLayout.PREFERRED_SIZE,
+														.addComponent(queryDesc))
+												.addPreferredGap(
+														ComponentPlacement.RELATED)
+												.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+														.addComponent(diseaseLabel)
+														.addComponent(diseaseCombo, GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-														.addComponent(avgCorrLbl).addComponent(lblAnd))
-												.addGap(36)
+														.addComponent(disDscCombo, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+														.addComponent(disDesc)
+														.addComponent(disTypCombo, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+														.addComponent(disType))
+												.addPreferredGap(ComponentPlacement.RELATED)
 												.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-														.addComponent(executeBtn).addComponent(resetBtn)))
-										.addGroup(gl_panel_1.createSequentialGroup().addComponent(dis4Chk)
-												.addPreferredGap(ComponentPlacement.UNRELATED)
+														.addComponent(clstrLabel, GroupLayout.PREFERRED_SIZE, 22,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(clusterId, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addPreferredGap(ComponentPlacement.RELATED)
 												.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-														.addComponent(dis2Chk).addComponent(dis6Chk))
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-														.addComponent(dis3Chk).addComponent(dis5Chk))))
-						.addGap(18).addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 294, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(msgBox)
-						.addContainerGap(64, Short.MAX_VALUE)));
+														.addComponent(probeLabel).addComponent(probeId,
+																GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+														.addComponent(mUnitLabel).addComponent(mesureUnitId,
+																GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+																GroupLayout.PREFERRED_SIZE))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+														.addGroup(gl_panel_1.createSequentialGroup().addGroup(gl_panel_1
+																.createParallelGroup(Alignment.LEADING)
+																.addGroup(gl_panel_1.createSequentialGroup()
+																		.addGroup(gl_panel_1
+																				.createParallelGroup(Alignment.BASELINE)
+																				.addComponent(goId,
+																						GroupLayout.PREFERRED_SIZE,
+																						GroupLayout.DEFAULT_SIZE,
+																						GroupLayout.PREFERRED_SIZE)
+																				.addComponent(dis1Chk))
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addComponent(statistics,
+																				GroupLayout.PREFERRED_SIZE,
+																				GroupLayout.DEFAULT_SIZE,
+																				GroupLayout.PREFERRED_SIZE))
+																.addGroup(gl_panel_1.createSequentialGroup()
+																		.addComponent(goIdLabel)
+																		.addPreferredGap(ComponentPlacement.UNRELATED)
+																		.addComponent(statsLabel))
+																.addComponent(chlkBoxLbl, Alignment.TRAILING))
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addGroup(gl_panel_1
+																		.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(dis1, GroupLayout.PREFERRED_SIZE,
+																				GroupLayout.DEFAULT_SIZE,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addComponent(dis2, GroupLayout.PREFERRED_SIZE,
+																				GroupLayout.DEFAULT_SIZE,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addComponent(avgCorrLbl).addComponent(lblAnd))
+																.addGap(36)
+																.addGroup(gl_panel_1
+																		.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(executeBtn)
+																		.addComponent(resetBtn)))
+														.addGroup(gl_panel_1.createSequentialGroup()
+																.addComponent(dis4Chk)
+																.addPreferredGap(ComponentPlacement.UNRELATED)
+																.addGroup(gl_panel_1
+																		.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(dis2Chk).addComponent(dis6Chk))
+																.addPreferredGap(ComponentPlacement.UNRELATED)
+																.addGroup(gl_panel_1
+																		.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(dis3Chk).addComponent(dis5Chk))))
+												.addGap(18)
+												.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 294,
+														GroupLayout.PREFERRED_SIZE)
+												.addPreferredGap(ComponentPlacement.RELATED).addComponent(msgBox)
+												.addContainerGap(80, Short.MAX_VALUE)));
 
 		lblQueryResults = new JLabel("Query Results");
 		lblQueryResults.setHorizontalAlignment(SwingConstants.LEFT);
@@ -619,6 +680,10 @@ public class CentralBiostarWindow {
 			diseaseLabel.setVisible(true);
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(false);
+			disType.setVisible(true);
+			disTypCombo.setVisible(true);
+			disDscCombo.setVisible(true);
+			disDesc.setVisible(true);
 			break;
 		case QUERY_2:
 			queryDesc.setText("Query Desc: Drugs applied to patients with a particular disease");
@@ -640,6 +705,10 @@ public class CentralBiostarWindow {
 			diseaseLabel.setVisible(true);
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(false);
+			disType.setVisible(true);
+			disTypCombo.setVisible(true);
+			disDscCombo.setVisible(true);
+			disDesc.setVisible(true);
 			break;
 		case QUERY_3:
 			queryDesc.setText("Query Desc: Expression values of patients with a particulr disease");
@@ -657,6 +726,10 @@ public class CentralBiostarWindow {
 			diseaseLabel.setVisible(true);
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(false);
+			disType.setVisible(false);
+			disTypCombo.setVisible(false);
+			disDscCombo.setVisible(false);
+			disDesc.setVisible(false);
 			break;
 		case QUERY_4:
 			queryDesc.setText("Query Desc: T-Statistics of expression values betwwen two disease groups");
@@ -682,6 +755,10 @@ public class CentralBiostarWindow {
 			diseaseLabel.setVisible(true);
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(false);
+			disType.setVisible(false);
+			disTypCombo.setVisible(false);
+			disDscCombo.setVisible(false);
+			disDesc.setVisible(false);
 			break;
 		case QUERY_5:
 			queryDesc.setText("Query Desc: F-Statistics of expression values between two or more disease groups");
@@ -696,6 +773,7 @@ public class CentralBiostarWindow {
 			statistics.setVisible(true);
 			statsLabel.setVisible(true);
 			statistics.setSelectedIndex(1);
+			statistics.setEnabled(false);
 			statistics.setEditable(false);
 			dis1.setVisible(false);
 			dis2.setVisible(false);
@@ -710,6 +788,10 @@ public class CentralBiostarWindow {
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(true);
 			chlkBoxLbl.setText(statistics.getSelectedItem() + " Between");
+			disType.setVisible(false);
+			disTypCombo.setVisible(false);
+			disDscCombo.setVisible(false);
+			disDesc.setVisible(false);
 			break;
 		case QUERY_6:
 			queryDesc.setText("Query Desc: Avg. Correlation of expression values betwwen two disease groups");
@@ -732,6 +814,11 @@ public class CentralBiostarWindow {
 			avgCorrLbl.setText("Avg. Correlation Between");
 			errorMsg.setVisible(false);
 			hideShowChkBoxes(false);
+			disType.setVisible(false);
+			disTypCombo.setVisible(false);
+			disDscCombo.setVisible(false);
+			disDesc.setVisible(false);
+			statistics.setEnabled(false);
 			break;
 		default:
 			break;
@@ -814,24 +901,27 @@ public class CentralBiostarWindow {
 				? "" : diseaseCombo.getSelectedItem().toString();
 		String disease1 = dis1.getSelectedItem() == null ? "" : dis1.getSelectedItem().toString();
 		String disease2 = dis2.getSelectedItem() == null ? "" : dis2.getSelectedItem().toString();
+		String disType = disTypCombo.getSelectedItem() == null || disTypCombo.getSelectedItem() == "All" ? ""
+				: disTypCombo.getSelectedItem().toString();
+		String disDsc = disDscCombo.getSelectedItem() == null || disDscCombo.getSelectedItem() == "All" ? ""
+				: disDscCombo.getSelectedItem().toString();
 		List<String[]> rawQueryResults = null;
 		Object[][] queryData = null;
 		DefaultTableModel model = null;
 		Object[] queryResult = null;
 		String goIdVal = goId.getText();
+		String stats = statistics.getSelectedItem() == null ? "" : statistics.getSelectedItem().toString();
 		long start = 0, end = 0;
 		switch (queryType) {
 		case QUERY_1:
 			start = System.currentTimeMillis();
-			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName,"leukemia","tumor");
+			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, disType, disDsc);
 			end = System.currentTimeMillis();
 			populateTable(queryResult, resultTable, resultCount, start, end);
 			break;
 		case QUERY_2:
-			String dsType = "";
-			String dsDsc = "";
 			start = System.currentTimeMillis();
-			queryResult = olapQueryClient.q2drugsForPatientsWithTumor(diseaseName, dsType, dsDsc);
+			queryResult = olapQueryClient.q2drugsForPatientsWithTumor(diseaseName, disType, disDsc);
 			end = System.currentTimeMillis();
 			populateTable(queryResult, resultTable, resultCount, start, end);
 			break;
@@ -851,7 +941,7 @@ public class CentralBiostarWindow {
 			break;
 		case QUERY_4:
 			start = System.currentTimeMillis();
-			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, goIdVal,"F Statistics");
+			queryResult = olapQueryClient.tstatALLpatientsquery4(diseaseName, goIdVal, stats);
 			end = System.currentTimeMillis();
 			populateTable(queryResult, resultTable, resultCount, start, end);
 			break;
@@ -1020,5 +1110,35 @@ public class CentralBiostarWindow {
 		dis4Chk.setVisible(show);
 		dis5Chk.setVisible(show);
 		dis6Chk.setVisible(show);
+	}
+
+	private void populateDiseaseTypeCombo() {
+		try {
+			Map<Integer, String> disTypes = olapQueryClient.getAllDiseaseTypes();
+			disTypCombo.insertItemAt("All", 0);
+			for (Entry<Integer, String> entry : disTypes.entrySet()) {
+				disTypCombo.insertItemAt(entry.getValue(), entry.getKey());
+			}
+			disTypCombo.setSelectedIndex(0);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		// TODO Auto-generated method stub
+
+	}
+
+	private void populateDiseaseDescCombo() {
+		try {
+			Map<Integer, String> disDesc = olapQueryClient.getAllDiseaseDesc();
+			disDscCombo.insertItemAt("All", 0);
+			for (Entry<Integer, String> entry : disDesc.entrySet()) {
+				disDscCombo.insertItemAt(entry.getValue(), entry.getKey());
+			}
+			disDscCombo.setSelectedIndex(0);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		// TODO Auto-generated method stub
+
 	}
 }
