@@ -23,7 +23,7 @@ public class OLAPQueries {
 
 	}
 
-	public Object[] queryForTumorALLPatients(String diseaseName, String patientId) throws SQLException {
+	public Object[] queryForTumorALLPatients(String diseaseName, String diseaseType, String diseaseDesc) throws SQLException {
 
 		PreparedStatement stmt = null;
 		int count = 0;
@@ -36,10 +36,17 @@ public class OLAPQueries {
 			queryOutput = new ArrayList<String[]>();
 			StringBuilder query = new StringBuilder();
 			query.append(
-					"select cf.P_ID as PATIENT_ID, ds.name as DISEASE_NAME, ds.type as DISEASE_TYPE, ds.description as DISEASE_DESC from clinical_fact cf, disease ds where cf.DS_ID=ds.DS_ID");
+					"select cf.P_ID as PATIENT_ID, ds.name as DISEASE_NAME, ds.type as DISEASE_TYPE, ds.description as DISEASE_DESC "
+                   +"from clinical_fact cf, disease ds where cf.DS_ID=ds.DS_ID");
 			if (diseaseName != null && diseaseName.length() > 0) {
-				query.append(" AND ds.name=?");
-			}
+                query.append(" AND ds.name=?");
+            }
+            if (diseaseName != null && diseaseType.length() > 0) {
+                query.append(" AND ds.type=?");
+            }
+            if (diseaseName != null && diseaseDesc.length() > 0) {
+                query.append(" AND ds.description=?");
+            }
 
 			// query.append(" and ds.type='leukemia' and ds.description='tumor'
 			// order by cf.P_ID ASC");
@@ -49,6 +56,12 @@ public class OLAPQueries {
 			if (diseaseName != null && diseaseName.length() > 0) {
 				stmt.setString(1, diseaseName);
 			}
+            if (diseaseType != null && diseaseType.length() > 0) {
+                stmt.setString(2, diseaseType);
+            }
+            if (diseaseDesc != null && diseaseDesc.length() > 0) {
+                stmt.setString(3, diseaseDesc);
+            }
 			ResultSet rs = stmt.executeQuery();
 			int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
@@ -273,10 +286,11 @@ public class OLAPQueries {
 			if (goid != null && goid.length() > 0) {
 
 				createv1query = "create view q4optv1 as "
-						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename
-						+ "' then 0 else 1 end as diseaseval "
-						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE " + "where gene_fact.GO_ID ="
-						+ goid + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
+						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename + "'"
+                        + " then 0 else 1 end as diseaseval "
+						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE "
+                        + "where gene_fact.GO_ID =" + goid
+                        + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
 						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
 			}
 
@@ -284,10 +298,19 @@ public class OLAPQueries {
 					+ " stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
 					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4optv1" + " group by PB_ID";
 
-			String selectv2queryungroup = "select " + " stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
+			String selectv2queryungroup = "select " + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
 					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4ttest";
 
-			stmt = conn.createStatement();
+            /*String selectv2querygroupftest = "select pb_id, " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
+					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1 " + "group by PB_ID";
+
+			String selectv2queryungroupftest = "select " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
+					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1";*/
+
+            int queryval;
+            stmt = conn.createStatement();
+            queryval = stmt.executeUpdate(dropv1query);
+            queryval = stmt.executeUpdate(createv1query);
 
 			// ResultSet rs = stmt.executeQuery(selectv2query);
 			ResultSet rs = stmt.executeQuery(selectv2queryungroup);
@@ -357,23 +380,19 @@ public class OLAPQueries {
 						+ goid + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
 						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID ");
 				if (diseases.size() > 0) {
-					createv1query.append("and ( ");
+					createv1query.append("and (");
 					for (int i = 0; i < diseases.size(); i++) {
 						if (i == 0)
 							createv1query.append("patientdiseasesample.ds_name = '" + diseases.get(i) + "'");
 						else
-							createv1query.append("or patientdiseasesample.ds_name = '" + diseases.get(i) + "'");
+							createv1query.append(" or patientdiseasesample.ds_name = '" + diseases.get(i) + "'");
 					}
-					createv1query.append("  )");
+					createv1query.append(")");
 				}
+
 
 			}
 
-			String selectv2querygroupftest = "select pb_id, " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1 " + "group by PB_ID";
-
-			String selectv2queryungroupftest = "select " + "stats_f_test(ds_name,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(ds_name,exp)two_sided_p_value " + "from Q5OPTV1";
 
 			String selectv2querygroupanova = "select pb_id, " + "stats_one_way_anova(ds_name,exp, 'F_RATIO')f_ratio, "
 					+ "stats_one_way_anova(ds_name,exp,'SIG')p_value " + "from q5optv1 " + "group by PB_ID";
@@ -389,7 +408,7 @@ public class OLAPQueries {
 			// ResultSet rs = stmt.executeQuery(selectv5query);
 			ResultSet rs = stmt.executeQuery(selectv2queryungroupanova);
 
-			int colCount = rs.getMetaData().getColumnCount();
+            int colCount = rs.getMetaData().getColumnCount();
 			columnNames = new String[colCount];
 
 			for (int i = 0; i < colCount; i++) {

@@ -823,7 +823,7 @@ public class CentralBiostarWindow {
 		switch (queryType) {
 		case QUERY_1:
 			start = System.currentTimeMillis();
-			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName, null);
+			queryResult = olapQueryClient.queryForTumorALLPatients(diseaseName,"leukemia","tumor");
 			end = System.currentTimeMillis();
 			populateTable(queryResult, resultTable, resultCount, start, end);
 			break;
