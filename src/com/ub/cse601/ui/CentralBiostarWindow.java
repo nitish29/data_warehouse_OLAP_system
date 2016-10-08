@@ -115,6 +115,7 @@ public class CentralBiostarWindow {
 	private JLabel kdQTime;
 	private JPanel lblNewLabel;
 	private JLabel lblNewLabel_1;
+	private JLabel lblNewLabel_2;
 
 	/**
 	 * Create the application.
@@ -183,23 +184,31 @@ public class CentralBiostarWindow {
 					.addContainerGap(83, Short.MAX_VALUE))
 		);
 		
-		lblNewLabel_1 = new JLabel("CENTRAL BIOSTAR DATAWAREHOUSE");
+		lblNewLabel_1 = new JLabel("BAK DATAWAREHOUSE");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 50));
 		lblNewLabel_1.setForeground(new Color(30, 144, 255));
+		
+		lblNewLabel_2 = new JLabel("Bioinformatics Assisting Knowledge-Discovery Datawarehouse");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		lblNewLabel_2.setForeground(new Color(32, 178, 170));
 		GroupLayout gl_lblNewLabel = new GroupLayout(lblNewLabel);
 		gl_lblNewLabel.setHorizontalGroup(
-			gl_lblNewLabel.createParallelGroup(Alignment.LEADING)
+			gl_lblNewLabel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_lblNewLabel.createSequentialGroup()
-					.addGap(63)
-					.addComponent(lblNewLabel_1)
-					.addContainerGap(69, Short.MAX_VALUE))
+					.addContainerGap(297, Short.MAX_VALUE)
+					.addGroup(gl_lblNewLabel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(lblNewLabel_2)
+						.addComponent(lblNewLabel_1))
+					.addGap(241))
 		);
 		gl_lblNewLabel.setVerticalGroup(
-			gl_lblNewLabel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_lblNewLabel.createSequentialGroup()
+			gl_lblNewLabel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_lblNewLabel.createSequentialGroup()
 					.addGap(280)
 					.addComponent(lblNewLabel_1)
-					.addContainerGap(294, Short.MAX_VALUE))
+					.addGap(36)
+					.addComponent(lblNewLabel_2)
+					.addContainerGap(233, Short.MAX_VALUE))
 		);
 		lblNewLabel.setLayout(gl_lblNewLabel);
 		panel_5.setLayout(gl_panel_5);
