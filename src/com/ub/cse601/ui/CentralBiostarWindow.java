@@ -168,6 +168,7 @@ public class CentralBiostarWindow {
 		tabbedPane.addTab("Part 1-About App", null, panel_5, null);
 		
 		lblNewLabel = new JPanel();
+		lblNewLabel.setForeground(new Color(188, 143, 143));
 		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
 		gl_panel_5.setHorizontalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
@@ -190,7 +191,7 @@ public class CentralBiostarWindow {
 		
 		lblNewLabel_2 = new JLabel("Bioinformatics Assisting Knowledge-Discovery Datawarehouse");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		lblNewLabel_2.setForeground(new Color(32, 178, 170));
+		lblNewLabel_2.setForeground(new Color(138, 43, 226));
 		GroupLayout gl_lblNewLabel = new GroupLayout(lblNewLabel);
 		gl_lblNewLabel.setHorizontalGroup(
 			gl_lblNewLabel.createParallelGroup(Alignment.TRAILING)
@@ -1182,7 +1183,7 @@ public class CentralBiostarWindow {
 					double[] list2toarr = list2.stream().mapToDouble(Double::doubleValue).toArray();
 
 					finalpvalue = new TTest().homoscedasticTTest(list1toarr, list2toarr);
-					DecimalFormat df = new DecimalFormat("#.#########################");
+					DecimalFormat df = new DecimalFormat("#.###########################");
 					ppValue.setText("Patient " + pId + " P-Value: " + df.format(finalpvalue));
 					if (finalpvalue < pVal) {
 						pClassify.setText("Patient " + pId + " is classified as having " + kdDis);

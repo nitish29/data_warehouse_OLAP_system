@@ -273,8 +273,7 @@ public class OLAPQueries {
 						+ "from gene_fact, probe, microarray_fact, PATIENTDISEASESAMPLE " + "where gene_fact.GO_ID ="
 						+ goid + " and gene_fact.U_ID = probe.U_ID " + "and probe.pb_id = microarray_fact.pb_id "
 						+ "and microarray_fact.s_id = PATIENTDISEASESAMPLE.S_ID";
-			}
-			else{
+			} else {
 				createv1query = "create view q4optv1 as "
 						+ "select go_id, microarray_fact.pb_id, exp, p_id,ds_name, case when ds_name = '" + diseasename
 						+ "'" + " then 0 else 1 end as diseaseval "
@@ -323,11 +322,11 @@ public class OLAPQueries {
 			for (int i = 0; i < colCount; i++) {
 				columnNames[i] = rs.getMetaData().getColumnLabel(i + 1);
 			}
-
+			DecimalFormat df = new DecimalFormat("#.#####");
 			while (rs.next()) {
 				String[] row = new String[colCount];
 				for (int i = 0; i < colCount; i++) {
-					row[i] = rs.getString(i + 1);
+					row[i] = df.format(rs.getDouble(i + 1));
 				}
 				queryOutput.add(row);
 				count++;
@@ -483,16 +482,19 @@ public class OLAPQueries {
 
 			String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
 
-			/*String createv3query = "create view part3v3 as " + "select u_id, t_observed, two_sided_p_value, "
-					+ "case when two_sided_p_value < " + pvalue
-					+ " then 'informative' else 'non-informative' end as genestat, " + "case when two_sided_p_value < "
-					+ pvalue + " then 1 else 0 end as infogene " + "from part3v2 " + "order by genestat";
-					*/
+			/*
+			 * String createv3query = "create view part3v3 as " +
+			 * "select u_id, t_observed, two_sided_p_value, " +
+			 * "case when two_sided_p_value < " + pvalue +
+			 * " then 'informative' else 'non-informative' end as genestat, " +
+			 * "case when two_sided_p_value < " + pvalue +
+			 * " then 1 else 0 end as infogene " + "from part3v2 " +
+			 * "order by genestat";
+			 */
 
-            String createv3query = "create view part3v3 as " + "select u_id as informative_genes, t_observed, two_sided_p_value "
-                    + "from part3v2 "
-                    + "where two_sided_p_value < "+pvalue
-                    + " order by u_id";
+			String createv3query = "create view part3v3 as "
+					+ "select u_id as informative_genes, t_observed, two_sided_p_value " + "from part3v2 "
+					+ "where two_sided_p_value < " + pvalue + " order by u_id";
 
 			String selectFinalQuery = "select * from part3v3";
 
