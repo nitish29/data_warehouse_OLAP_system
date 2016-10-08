@@ -483,10 +483,16 @@ public class OLAPQueries {
 
 			String dropv3query = "begin execute immediate 'drop view part3v3'; exception when others then null; end;";
 
-			String createv3query = "create view part3v3 as " + "select u_id, t_observed, two_sided_p_value, "
+			/*String createv3query = "create view part3v3 as " + "select u_id, t_observed, two_sided_p_value, "
 					+ "case when two_sided_p_value < " + pvalue
 					+ " then 'informative' else 'non-informative' end as genestat, " + "case when two_sided_p_value < "
 					+ pvalue + " then 1 else 0 end as infogene " + "from part3v2 " + "order by genestat";
+					*/
+
+            String createv3query = "create view part3v3 as " + "select u_id as informative_genes, t_observed, two_sided_p_value "
+                    + "from part3v2 "
+                    + "where two_sided_p_value < "+pvalue
+                    + " order by u_id";
 
 			String selectFinalQuery = "select * from part3v3";
 
