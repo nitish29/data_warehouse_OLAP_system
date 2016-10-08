@@ -460,9 +460,9 @@ public class CentralBiostarWindow {
 					.addContainerGap())
 				.addGroup(gl_panel_3.createSequentialGroup()
 					.addComponent(lblQueryResults)
-					.addPreferredGap(ComponentPlacement.RELATED, 674, Short.MAX_VALUE)
+					.addGap(674)
 					.addComponent(queryTime, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -563,8 +563,9 @@ public class CentralBiostarWindow {
 				.addComponent(kdPane, GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
 				.addGroup(gl_kdPanel.createSequentialGroup()
 					.addComponent(label_2)
-					.addPreferredGap(ComponentPlacement.RELATED, 743, Short.MAX_VALUE)
-					.addComponent(kdQTime, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE))
+					.addGap(743)
+					.addComponent(kdQTime, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+					.addGap(0, 0, Short.MAX_VALUE))
 				.addGroup(gl_kdPanel.createSequentialGroup()
 					.addComponent(kdResCnt)
 					.addContainerGap())
