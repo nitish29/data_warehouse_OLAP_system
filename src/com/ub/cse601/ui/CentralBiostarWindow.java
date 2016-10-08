@@ -40,6 +40,7 @@ import com.ub.cse601.sql.OLAPQueries;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Font;
 
 public class CentralBiostarWindow {
 
@@ -112,6 +113,8 @@ public class CentralBiostarWindow {
 	private JLabel ppValue;
 	private JLabel pClassify;
 	private JLabel kdQTime;
+	private JPanel lblNewLabel;
+	private JLabel lblNewLabel_1;
 
 	/**
 	 * Create the application.
@@ -146,6 +149,7 @@ public class CentralBiostarWindow {
 
 	private void initialize() throws Exception {
 		frame = new JFrame();
+		frame.setTitle("CSE 601-Project 1: OLAP Operations and Knowledge Discovery");
 		frame.setSize(1200, 800);
 		// show frame
 		frame.setVisible(true);
@@ -158,6 +162,47 @@ public class CentralBiostarWindow {
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		panel.add(tabbedPane);
+		
+		JPanel panel_5 = new JPanel();
+		tabbedPane.addTab("Part 1-About App", null, panel_5, null);
+		
+		lblNewLabel = new JPanel();
+		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
+		gl_panel_5.setHorizontalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 1122, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(43, Short.MAX_VALUE))
+		);
+		gl_panel_5.setVerticalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addGap(5)
+					.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 635, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(83, Short.MAX_VALUE))
+		);
+		
+		lblNewLabel_1 = new JLabel("CENTRAL BIOSTAR DATAWAREHOUSE");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 50));
+		lblNewLabel_1.setForeground(new Color(30, 144, 255));
+		GroupLayout gl_lblNewLabel = new GroupLayout(lblNewLabel);
+		gl_lblNewLabel.setHorizontalGroup(
+			gl_lblNewLabel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_lblNewLabel.createSequentialGroup()
+					.addGap(63)
+					.addComponent(lblNewLabel_1)
+					.addContainerGap(69, Short.MAX_VALUE))
+		);
+		gl_lblNewLabel.setVerticalGroup(
+			gl_lblNewLabel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_lblNewLabel.createSequentialGroup()
+					.addGap(280)
+					.addComponent(lblNewLabel_1)
+					.addContainerGap(294, Short.MAX_VALUE))
+		);
+		lblNewLabel.setLayout(gl_lblNewLabel);
+		panel_5.setLayout(gl_panel_5);
 		// frame.setBounds(100, 100, 450, 300);
 		msgBox = new JLabel("Initializing app....");
 
