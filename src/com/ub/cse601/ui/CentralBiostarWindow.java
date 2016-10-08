@@ -654,7 +654,7 @@ public class CentralBiostarWindow {
 
 	public void populateKDQueries(JComboBox kdComboBox) {
 		kdComboBox.setModel(new DefaultComboBoxModel<String>(
-				new String[] { "T-Statistics", "F-Statistics", "Informative Genes", "Classify Patient" }));
+				new String[]{"T-Statistics", "F-Statistics", "Informative Genes", "Classify Patient"}));
 	}
 
 	public void onChangeQuery() {
@@ -901,9 +901,9 @@ public class CentralBiostarWindow {
 				? "" : diseaseCombo.getSelectedItem().toString();
 		String disease1 = dis1.getSelectedItem() == null ? "" : dis1.getSelectedItem().toString();
 		String disease2 = dis2.getSelectedItem() == null ? "" : dis2.getSelectedItem().toString();
-		String disType = disTypCombo.getSelectedItem() == null || disTypCombo.getSelectedItem() == "All" ? ""
+		String disType = disTypCombo.getSelectedItem() == null || disTypCombo.getSelectedItem() == "Select Everything" ? ""
 				: disTypCombo.getSelectedItem().toString();
-		String disDsc = disDscCombo.getSelectedItem() == null || disDscCombo.getSelectedItem() == "All" ? ""
+		String disDsc = disDscCombo.getSelectedItem() == null || disDscCombo.getSelectedItem() == "Select Everything" ? ""
 				: disDscCombo.getSelectedItem().toString();
 		List<String[]> rawQueryResults = null;
 		Object[][] queryData = null;
@@ -1115,7 +1115,7 @@ public class CentralBiostarWindow {
 	private void populateDiseaseTypeCombo() {
 		try {
 			Map<Integer, String> disTypes = olapQueryClient.getAllDiseaseTypes();
-			disTypCombo.insertItemAt("All", 0);
+			disTypCombo.insertItemAt("Select Everything", 0);
 			for (Entry<Integer, String> entry : disTypes.entrySet()) {
 				disTypCombo.insertItemAt(entry.getValue(), entry.getKey());
 			}
@@ -1130,7 +1130,7 @@ public class CentralBiostarWindow {
 	private void populateDiseaseDescCombo() {
 		try {
 			Map<Integer, String> disDesc = olapQueryClient.getAllDiseaseDesc();
-			disDscCombo.insertItemAt("All", 0);
+			disDscCombo.insertItemAt("Select Everything", 0);
 			for (Entry<Integer, String> entry : disDesc.entrySet()) {
 				disDscCombo.insertItemAt(entry.getValue(), entry.getKey());
 			}
