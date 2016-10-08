@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,9 @@ import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.inference.TTest;
 
 import com.ub.cse601.sql.OLAPQueries;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class CentralBiostarWindow {
 
@@ -69,8 +73,6 @@ public class CentralBiostarWindow {
 	private static final String QUERY_6 = "Query 6";
 	private static final String QUERY_7 = "Informative Genes";
 	private static final String QUERY_8 = "Classify Patient";
-	private static final String QUERY_9 = "T-Statistics";
-	private static final String QUERY_10 = "F-Statistics";
 
 	private JComboBox<String> dis1;
 	private JLabel lblAnd;
@@ -89,8 +91,7 @@ public class CentralBiostarWindow {
 	JLabel queryDesc;
 	JComboBox pIdCombo;
 	JPanel kdPanel;
-	JScrollPane kdTable;
-	JLabel kdQResCnt;
+	JScrollPane kdPane;
 	JButton kdReset;
 	JButton kdExecute;
 	private JLabel chlkBoxLbl;
@@ -105,6 +106,12 @@ public class CentralBiostarWindow {
 	JLabel disType;
 	JLabel disDesc;
 	JComboBox disTypCombo;
+	private JLabel kdErrMsg;
+	private JTable kdTable;
+	private JLabel kdResCnt;
+	private JLabel ppValue;
+	private JLabel pClassify;
+	private JLabel kdQTime;
 
 	/**
 	 * Create the application.
@@ -525,32 +532,48 @@ public class CentralBiostarWindow {
 		pIdLbl = new JLabel("Patient Id");
 
 		pIdCombo = new JComboBox();
-		pIdCombo.setModel(new DefaultComboBoxModel(new String[] { "P1", "P2", "P3", "P4", "P5", "P6" }));
+		pIdCombo.setModel(new DefaultComboBoxModel(new String[] { "P1", "P2", "P3", "P4", "P5" }));
 
 		JLabel label = new JLabel("App initialized...Execute Queries Now");
 
 		kdPanel = new JPanel();
 
-		kdTable = new JScrollPane();
-
-		kdQResCnt = new JLabel();
+		kdPane = new JScrollPane();
 
 		JLabel label_2 = new JLabel("Query Results");
 		label_2.setHorizontalAlignment(SwingConstants.LEFT);
+
+		kdResCnt = new JLabel("");
+		
+		kdQTime = new JLabel("");
 		GroupLayout gl_kdPanel = new GroupLayout(kdPanel);
-		gl_kdPanel.setHorizontalGroup(gl_kdPanel.createParallelGroup(Alignment.LEADING).addGap(0, 948, Short.MAX_VALUE)
-				.addComponent(kdTable, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
-				.addGroup(gl_kdPanel.createSequentialGroup().addComponent(kdQResCnt).addContainerGap())
-				.addGroup(gl_kdPanel.createSequentialGroup().addComponent(label_2).addContainerGap()));
-		gl_kdPanel
-				.setVerticalGroup(
-						gl_kdPanel.createParallelGroup(Alignment.LEADING).addGap(0, 294, Short.MAX_VALUE)
-								.addGroup(gl_kdPanel.createSequentialGroup().addGap(7).addComponent(label_2)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(kdTable, GroupLayout.PREFERRED_SIZE, 229,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED).addComponent(kdQResCnt)
-										.addContainerGap(28, Short.MAX_VALUE)));
+		gl_kdPanel.setHorizontalGroup(
+			gl_kdPanel.createParallelGroup(Alignment.LEADING)
+				.addComponent(kdPane, GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
+				.addGroup(gl_kdPanel.createSequentialGroup()
+					.addComponent(label_2)
+					.addPreferredGap(ComponentPlacement.RELATED, 743, Short.MAX_VALUE)
+					.addComponent(kdQTime, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_kdPanel.createSequentialGroup()
+					.addComponent(kdResCnt)
+					.addContainerGap())
+		);
+		gl_kdPanel.setVerticalGroup(
+			gl_kdPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_kdPanel.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_kdPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_2)
+						.addComponent(kdQTime))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(kdPane, GroupLayout.PREFERRED_SIZE, 229, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(kdResCnt)
+					.addContainerGap(22, Short.MAX_VALUE))
+		);
+
+		kdTable = new JTable();
+		kdPane.setViewportView(kdTable);
 		kdPanel.setLayout(gl_kdPanel);
 
 		kdReset = new JButton("Reset");
@@ -584,15 +607,15 @@ public class CentralBiostarWindow {
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Knowledge discovery",
 				TitledBorder.LEFT, TitledBorder.TOP, null, new Color(199, 21, 133)));
+
+		kdErrMsg = new JLabel("");
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_2.createSequentialGroup().addGap(33).addGroup(gl_panel_2.createParallelGroup(
-						Alignment.LEADING, false)
+				.addGroup(gl_panel_2.createSequentialGroup().addGap(33).addGroup(gl_panel_2
+						.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(label, GroupLayout.PREFERRED_SIZE, 212, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_2
-								.createSequentialGroup()
-								.addGroup(gl_panel_2
-										.createParallelGroup(Alignment.LEADING).addComponent(kdQuery)
+						.addGroup(gl_panel_2.createSequentialGroup()
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addComponent(kdQuery)
 										.addComponent(kdDisLbl).addComponent(thrsValue).addComponent(pIdLbl))
 								.addGap(128)
 								.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
@@ -608,34 +631,94 @@ public class CentralBiostarWindow {
 												.addComponent(kdExecute, GroupLayout.PREFERRED_SIZE, 106,
 														GroupLayout.PREFERRED_SIZE)))
 								.addGap(27)
-								.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 484, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addComponent(kdErrMsg)
+										.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 484,
+												GroupLayout.PREFERRED_SIZE)))
 						.addComponent(kdPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addContainerGap(259, Short.MAX_VALUE)));
-		gl_panel_2.setVerticalGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addGroup(gl_panel_2
-				.createSequentialGroup().addGap(
-						26)
-				.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING).addGroup(gl_panel_2.createSequentialGroup()
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(kdQuery).addComponent(
-								kdCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-								GroupLayout.PREFERRED_SIZE))
-						.addGap(30)
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING).addComponent(kdDisLbl)
-								.addComponent(kdDisCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addGap(31)
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(thrsValue)
-								.addComponent(thrsText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addGap(29)
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(pIdLbl).addComponent(
-								pIdCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-								GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE).addComponent(kdReset)
-								.addComponent(kdExecute)))
-						.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE))
-				.addGap(27).addComponent(kdPanel, GroupLayout.PREFERRED_SIZE, 294, GroupLayout.PREFERRED_SIZE)
-				.addGap(43).addComponent(label).addGap(85)));
+						.addContainerGap(139, Short.MAX_VALUE)));
+		gl_panel_2
+				.setVerticalGroup(
+						gl_panel_2
+								.createParallelGroup(
+										Alignment.LEADING)
+								.addGroup(
+										gl_panel_2.createSequentialGroup()
+												.addGroup(gl_panel_2
+														.createParallelGroup(
+																Alignment.TRAILING)
+														.addGroup(
+																gl_panel_2.createSequentialGroup().addGap(26)
+																		.addGroup(
+																				gl_panel_2
+																						.createParallelGroup(
+																								Alignment.BASELINE)
+																						.addComponent(kdQuery)
+																						.addComponent(kdCombo,
+																								GroupLayout.PREFERRED_SIZE,
+																								GroupLayout.DEFAULT_SIZE,
+																								GroupLayout.PREFERRED_SIZE)
+																						.addComponent(kdErrMsg))
+																		.addGap(30)
+																		.addGroup(
+																				gl_panel_2
+																						.createParallelGroup(
+																								Alignment.TRAILING)
+																						.addComponent(kdDisLbl)
+																						.addComponent(kdDisCombo,
+																								GroupLayout.PREFERRED_SIZE,
+																								GroupLayout.DEFAULT_SIZE,
+																								GroupLayout.PREFERRED_SIZE))
+																		.addGap(31)
+																		.addGroup(
+																				gl_panel_2
+																						.createParallelGroup(
+																								Alignment.BASELINE)
+																						.addComponent(thrsValue)
+																						.addComponent(thrsText,
+																								GroupLayout.PREFERRED_SIZE,
+																								GroupLayout.DEFAULT_SIZE,
+																								GroupLayout.PREFERRED_SIZE))
+																		.addGap(29)
+																		.addGroup(
+																				gl_panel_2
+																						.createParallelGroup(
+																								Alignment.BASELINE)
+																						.addComponent(pIdLbl)
+																						.addComponent(pIdCombo,
+																								GroupLayout.PREFERRED_SIZE,
+																								GroupLayout.DEFAULT_SIZE,
+																								GroupLayout.PREFERRED_SIZE))
+																		.addPreferredGap(ComponentPlacement.RELATED, 29,
+																				Short.MAX_VALUE)
+																		.addGroup(
+																				gl_panel_2
+																						.createParallelGroup(
+																								Alignment.BASELINE)
+																						.addComponent(kdReset)
+																						.addComponent(kdExecute)))
+														.addGroup(gl_panel_2.createSequentialGroup().addContainerGap()
+																.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 164,
+																		GroupLayout.PREFERRED_SIZE)))
+												.addGap(27)
+												.addComponent(kdPanel, GroupLayout.PREFERRED_SIZE, 294,
+														GroupLayout.PREFERRED_SIZE)
+												.addGap(43).addComponent(label).addGap(85)));
+
+		ppValue = new JLabel("");
+		ppValue.setForeground(new Color(0, 191, 255));
+
+		pClassify = new JLabel("");
+		pClassify.setForeground(new Color(0, 191, 255));
+		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+		gl_panel_4.setHorizontalGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4
+						.createSequentialGroup().addContainerGap().addGroup(gl_panel_4
+								.createParallelGroup(Alignment.LEADING).addComponent(ppValue).addComponent(pClassify))
+						.addContainerGap(404, Short.MAX_VALUE)));
+		gl_panel_4.setVerticalGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup().addGap(34).addComponent(ppValue).addGap(31)
+						.addComponent(pClassify).addContainerGap(42, Short.MAX_VALUE)));
+		panel_4.setLayout(gl_panel_4);
 		panel_2.setLayout(gl_panel_2);
 
 		// populate disease combo
@@ -653,8 +736,9 @@ public class CentralBiostarWindow {
 	}
 
 	public void populateKDQueries(JComboBox kdComboBox) {
-		kdComboBox.setModel(new DefaultComboBoxModel<String>(
-				new String[]{"T-Statistics", "F-Statistics", "Informative Genes", "Classify Patient"}));
+
+		kdComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Informative Genes", "Classify Patient" }));
+		kdComboBox.setSelectedIndex(0);
 	}
 
 	public void onChangeQuery() {
@@ -847,49 +931,6 @@ public class CentralBiostarWindow {
 			pIdLbl.setVisible(true);
 			pIdCombo.setVisible(true);
 			break;
-		case QUERY_9:
-			queryDesc.setText("Query Desc: Expression values of patients with a particulr disease");
-			diseaseCombo.setVisible(true);
-			clusterId.setVisible(true);
-			clstrLabel.setVisible(true);
-			mUnitLabel.setVisible(true);
-			mesureUnitId.setVisible(true);
-			statsLabel.setVisible(false);
-			statistics.setVisible(false);
-			avgCorrLbl.setVisible(false);
-			dis1.setVisible(false);
-			dis2.setVisible(false);
-			lblAnd.setVisible(false);
-			diseaseLabel.setVisible(true);
-			errorMsg.setVisible(false);
-			hideShowChkBoxes(false);
-			break;
-		case QUERY_10:
-			queryDesc.setText("Query Desc: T-Statistics of expression values betwwen two disease groups");
-			diseaseCombo.setVisible(true);
-			clusterId.setVisible(false);
-			clstrLabel.setVisible(false);
-			probeId.setVisible(false);
-			probeLabel.setVisible(false);
-			mUnitLabel.setVisible(false);
-			mesureUnitId.setVisible(false);
-			goId.setVisible(true);
-			goIdLabel.setVisible(true);
-			statsLabel.setVisible(false);
-			statistics.setVisible(false);
-			avgCorrLbl.setVisible(false);
-			dis1.setVisible(false);
-			dis2.setVisible(false);
-			lblAnd.setVisible(false);
-			statistics.setVisible(true);
-			statsLabel.setVisible(true);
-			statistics.setSelectedIndex(0);
-			statistics.setEditable(false);
-			diseaseLabel.setVisible(true);
-			errorMsg.setVisible(false);
-			hideShowChkBoxes(false);
-			break;
-
 		default:
 			break;
 		}
@@ -897,21 +938,25 @@ public class CentralBiostarWindow {
 	}
 
 	private void executeQuery(String queryType) throws SQLException {
-		String diseaseName = diseaseCombo.getSelectedItem() == null || diseaseCombo.getSelectedItem() == "Select Everything"
-				? "" : diseaseCombo.getSelectedItem().toString();
+		String diseaseName = diseaseCombo.getSelectedItem() == null
+				|| diseaseCombo.getSelectedItem() == "Select Everything" ? ""
+						: diseaseCombo.getSelectedItem().toString();
 		String disease1 = dis1.getSelectedItem() == null ? "" : dis1.getSelectedItem().toString();
 		String disease2 = dis2.getSelectedItem() == null ? "" : dis2.getSelectedItem().toString();
-		String disType = disTypCombo.getSelectedItem() == null || disTypCombo.getSelectedItem() == "Select Everything" ? ""
-				: disTypCombo.getSelectedItem().toString();
-		String disDsc = disDscCombo.getSelectedItem() == null || disDscCombo.getSelectedItem() == "Select Everything" ? ""
-				: disDscCombo.getSelectedItem().toString();
+		String disType = disTypCombo.getSelectedItem() == null || disTypCombo.getSelectedItem() == "Select Everything"
+				? "" : disTypCombo.getSelectedItem().toString();
+		String disDsc = disDscCombo.getSelectedItem() == null || disDscCombo.getSelectedItem() == "Select Everything"
+				? "" : disDscCombo.getSelectedItem().toString();
 		List<String[]> rawQueryResults = null;
 		Object[][] queryData = null;
 		DefaultTableModel model = null;
 		Object[] queryResult = null;
 		String goIdVal = goId.getText();
 		String stats = statistics.getSelectedItem() == null ? "" : statistics.getSelectedItem().toString();
+		String pValue = thrsText.getText();
 		long start = 0, end = 0;
+		String kdDis = kdDisCombo.getSelectedItem() == null ? "" : kdDisCombo.getSelectedItem().toString();
+		String pId = pIdCombo.getSelectedItem().toString();
 		switch (queryType) {
 		case QUERY_1:
 			start = System.currentTimeMillis();
@@ -1008,45 +1053,91 @@ public class CentralBiostarWindow {
 			break;
 
 		case QUERY_7:
-			// Map<String, Double> map1 = new HashMap<>();
-			// Map<String, Double> map2 = new HashMap<>();
-			olapQueryClient.findInformativeGenes("ALL", 0.01);
-
-			List<Double> list1 = new ArrayList<Double>();
-			List<Double> list2 = new ArrayList<Double>();
-
-			Double finalpvalue;
-
-			Object[] expData = olapQueryClient.classifynewpatientcorrelation(disease1, 0.01, "P1");
-			Map<Double, List<Double>> group1 = (Map<Double, List<Double>>) expData[0];
-			Map<Double, List<Double>> group2 = (Map<Double, List<Double>>) expData[1];
-			Map<String, List<Double>> group3 = (Map<String, List<Double>>) expData[2];
-
-			list1 = findcorr(group1, group3);
-			list2 = findcorr(group2, group3);
-
-			double[] list1toarr = list1.stream().mapToDouble(Double::doubleValue).toArray();
-			double[] list2toarr = list2.stream().mapToDouble(Double::doubleValue).toArray();
-
-			finalpvalue = new TTest().homoscedasticTTest(list1toarr, list2toarr);
-
-			System.out.print(finalpvalue);
-
-			if (finalpvalue < 0.01) {
-				System.out.print("New Patient has ALL");
+			if (pValue == null || pValue.length() == 0) {
+				kdErrMsg.setVisible(true);
+				kdErrMsg.setText("!Threshold P-value can't be empty.Please input number between 0 and 1");
+				kdErrMsg.setForeground(Color.RED);
+				break;
 			} else {
-				System.out.print("New Patient does not have ALL");
-			}
+				double pVal = 0;
+				try {
+					pVal = Double.parseDouble(pValue);
+				} catch (NumberFormatException ex) {
+					kdErrMsg.setVisible(true);
+					kdErrMsg.setText("!Threshold P-value shoule be a number between 0 and 1");
+					kdErrMsg.setForeground(Color.RED);
+					break;
+				}
+				kdErrMsg.setVisible(false);
 
-			/*
-			 * String[] columnNames = new String[] { "DISEASE_GROUP_1",
-			 * "DISEASE_GROUP_2", "AVG_CORRELATION" }; List<String[]>
-			 * corrlResult = new ArrayList<String[]>(); corrlResult.add(new
-			 * String[] { disease1, disease2, new Double(avgCorrl).toString()
-			 * }); Object[] queryResultObj = new Object[3]; queryResultObj[0] =
-			 * 1; queryResultObj[1] = columnNames; queryResultObj[2] =
-			 * corrlResult; populateTable(queryResultObj);
-			 */
+				// Map<String, Double> map1 = new HashMap<>();
+				// Map<String, Double> map2 = new HashMap<>();
+				start = System.currentTimeMillis();
+				queryResultObj = olapQueryClient.findInformativeGenes(kdDis, pVal);
+				end = System.currentTimeMillis();
+				populateTable(queryResultObj, kdTable, kdResCnt, start, end);
+				kdQTime.setText("Query took: " + (end - start) + " ms");
+				break;
+			}
+		case QUERY_8:
+			if (pValue == null || pValue.length() == 0) {
+				kdErrMsg.setVisible(true);
+				kdErrMsg.setText("!Threshold P-value can't be empty.Please input number between 0 and 1");
+				kdErrMsg.setForeground(Color.RED);
+				break;
+			} else {
+				double pVal = 0;
+				try {
+					pVal = Double.parseDouble(pValue);
+				} catch (NumberFormatException ex) {
+					kdErrMsg.setVisible(true);
+					kdErrMsg.setText("!Threshold P-value shoule be a number between 0 and 1");
+					kdErrMsg.setForeground(Color.RED);
+					break;
+				}
+				kdErrMsg.setVisible(false);
+				start = System.currentTimeMillis();
+				queryResultObj = olapQueryClient.findInformativeGenes(kdDis, pVal);
+				end = System.currentTimeMillis();
+				populateTable(queryResultObj, kdTable, kdResCnt, start, end);
+				kdQTime.setText("Query took: " + (end - start) + " ms");
+				List<Double> list1 = new ArrayList<Double>();
+				List<Double> list2 = new ArrayList<Double>();
+				Double finalpvalue;
+				Object[] expData = olapQueryClient.classifynewpatientcorrelation(kdDis, pVal, pId);
+				Map<Double, List<Double>> group1 = (Map<Double, List<Double>>) expData[0];
+				Map<Double, List<Double>> group2 = (Map<Double, List<Double>>) expData[1];
+				Map<String, List<Double>> group3 = (Map<String, List<Double>>) expData[2];
+
+				list1 = findcorr(group1, group3);
+				list2 = findcorr(group2, group3);
+				if (list1.size() > 0 && list2.size() > 0) {
+					double[] list1toarr = list1.stream().mapToDouble(Double::doubleValue).toArray();
+					double[] list2toarr = list2.stream().mapToDouble(Double::doubleValue).toArray();
+
+					finalpvalue = new TTest().homoscedasticTTest(list1toarr, list2toarr);
+					DecimalFormat df = new DecimalFormat("#.#########################");
+					ppValue.setText("Patient " + pId + " P-Value: " + df.format(finalpvalue));
+					if (finalpvalue < pVal) {
+						pClassify.setText("Patient " + pId + " is classified as having " + kdDis);
+					} else {
+						pClassify.setText("Patient " + pId + " is classified as having not " + kdDis);
+					}
+				}
+
+				/*
+				 * String[] columnNames = new String[] { "DISEASE_GROUP_1",
+				 * "DISEASE_GROUP_2", "AVG_CORRELATION" }; List<String[]>
+				 * corrlResult = new ArrayList<String[]>(); corrlResult.add(new
+				 * String[] { disease1, disease2, new
+				 * Double(avgCorrl).toString() }); Object[] queryResultObj = new
+				 * Object[3]; queryResultObj[0] = 1; queryResultObj[1] =
+				 * columnNames; queryResultObj[2] = corrlResult;
+				 * populateTable(queryResultObj);
+				 */
+				break;
+			}
+		default:
 			break;
 		}
 	}
@@ -1054,9 +1145,10 @@ public class CentralBiostarWindow {
 	private List<Double> findcorr(Map<Double, List<Double>> group1, Map<String, List<Double>> group3) {
 
 		List group1list = new ArrayList<Double>();
-
-		List newplist = group3.entrySet().iterator().next().getValue();
-		group1.forEach((Double d, List list) -> group1list.add(calculateCorrelation(list, newplist)));
+		if (group1.size() > 0 && group3.size() > 0) {
+			List newplist = group3.entrySet().iterator().next().getValue();
+			group1.forEach((Double d, List list) -> group1list.add(calculateCorrelation(list, newplist)));
+		}
 
 		return group1list;
 	}
