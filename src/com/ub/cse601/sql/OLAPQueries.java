@@ -288,14 +288,14 @@ public class OLAPQueries {
 					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4optv1" + " group by PB_ID";
 
 			String selectv2queryungroup = "select " + "stats_t_test_indep(diseaseval,exp, 'STATISTIC', 0)t_observed,"
-					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4ttest";
+					+ " stats_t_test_indep(diseaseval,exp)two_sided_p_value" + " from q4optv1";
 
 			String selectv2querygroupftest = "select pb_id, "
 					+ "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest " + "group by PB_ID";
+					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4optv1 " + "group by PB_ID";
 
 			String selectv2queryungroupftest = "select " + "stats_f_test(diseaseval,exp, 'STATISTIC', 0)f_observed,"
-					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4ttest";
+					+ "stats_f_test(diseaseval,exp)two_sided_p_value " + "from q4optv1";
 
 			int queryval;
 			stmt = conn.createStatement();
