@@ -452,20 +452,31 @@ public class CentralBiostarWindow {
 
 		queryTime = new JLabel("");
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
-		gl_panel_3.setHorizontalGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+		gl_panel_3.setHorizontalGroup(
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
-				.addGroup(gl_panel_3.createSequentialGroup().addComponent(resultCount).addContainerGap())
-				.addGroup(gl_panel_3.createSequentialGroup().addComponent(lblQueryResults)
-						.addPreferredGap(ComponentPlacement.RELATED, 743, Short.MAX_VALUE).addComponent(queryTime,
-								GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap()));
-		gl_panel_3.setVerticalGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createSequentialGroup().addGap(7)
-						.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE).addComponent(lblQueryResults)
-								.addComponent(queryTime, GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 229, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(resultCount).addGap(28)));
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addComponent(resultCount)
+					.addContainerGap())
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addComponent(lblQueryResults)
+					.addPreferredGap(ComponentPlacement.RELATED, 674, Short.MAX_VALUE)
+					.addComponent(queryTime, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		gl_panel_3.setVerticalGroup(
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblQueryResults)
+						.addComponent(queryTime, GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 229, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(resultCount)
+					.addGap(28))
+		);
 
 		resultTable = new JTable();
 		scrollPane.setViewportView(resultTable);
@@ -1189,7 +1200,7 @@ public class CentralBiostarWindow {
 		kdCombo.setSelectedIndex(0);
 		kdDisCombo.setSelectedIndex(0);
 		pIdCombo.setSelectedIndex(0);
-		thrsValue.setText("0.01");
+		thrsText.setText("0.01");
 		// TODO Auto-generated method stub
 
 	}
