@@ -482,7 +482,7 @@ public class CentralBiostarWindow {
 		queryCombo.insertItemAt("Query 5", 4);
 		queryCombo.insertItemAt("Query 6", 5);
 		queryCombo.setSelectedIndex(0);
-		diseaseCombo.insertItemAt("Select All", 0);
+		diseaseCombo.insertItemAt("Select Everything", 0);
 		diseaseCombo.setSelectedIndex(0);
 		executeBtn.addActionListener(new ActionListener() {
 
@@ -897,7 +897,7 @@ public class CentralBiostarWindow {
 	}
 
 	private void executeQuery(String queryType) throws SQLException {
-		String diseaseName = diseaseCombo.getSelectedItem() == null || diseaseCombo.getSelectedItem() == "Select All"
+		String diseaseName = diseaseCombo.getSelectedItem() == null || diseaseCombo.getSelectedItem() == "Select Everything"
 				? "" : diseaseCombo.getSelectedItem().toString();
 		String disease1 = dis1.getSelectedItem() == null ? "" : dis1.getSelectedItem().toString();
 		String disease2 = dis2.getSelectedItem() == null ? "" : dis2.getSelectedItem().toString();
