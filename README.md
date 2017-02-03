@@ -1,4 +1,4 @@
-### BAK Datawarehouse system ###                                 
+### BAK Datawarehouse system                               
 
 Bioinformatics assissted knowledge-discovery of clinical and genomic data using the Oracle system
 
